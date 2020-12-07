@@ -26,4 +26,6 @@ The **server** folder is for the Python code.
 
 ## Server App
 
-[VueJS Flask](https://stackabuse.com/single-page-apps-with-vue-js-and-flask-jwt-authentication/)
+Follow tutorial at [VueJS Flask](https://stackabuse.com/single-page-apps-with-vue-js-and-flask-jwt-authentication/).
+Follow tutorial at [Create Tables](https://www.sqlitetutorial.net/sqlite-python/create-tables/).
+
