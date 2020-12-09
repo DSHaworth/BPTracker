@@ -9,7 +9,7 @@ https://www.sqlitetutorial.net/sqlite-python/create-tables/
 >>> from db_utils import db_connect
 >>> db_connect()
 ==================
->>> from db_utils import add_user_test, get_all_users_test
+>>> from db_utils import add_user_test, get_all_users_test, get_user_by_id_test
 >>> add_user_test()
 
 """
@@ -149,6 +149,7 @@ def create_table(conn, create_table_sql):
 def make_user(row):
     return User(userId=row["userId"], email=row["email"], firstname=row["firstname"], lastname=row["lastname"], image=row["image"])
 
+##### TESTS START ############
 def add_user_test():
     """
     userId, email, password, firstname, lastname, dob, image
@@ -170,17 +171,38 @@ def get_all_users_test():
     for user in users:
         print(user.__dict__)
 
+def get_user_by_id_test():
+    id = int(input("Id to fetch: "))
+    user = get_user_by_id(id)
+    if user:
+        print(user.__dict__)
+
+##### TESTS START ############
+
 def get_all_users():
     con = db_connect()
     with closing(con.cursor()) as c:
         c.execute(sql_get_all_users)
-        results = c.fetchall()
+        rows = c.fetchall()
 
     users = []
-    for row in results:
+    for row in rows:
         users.append(make_user(row))
     return users
 
+def get_user_by_id(id):
+    con = db_connect()
+    with closing(con.cursor()) as c:
+        c.execute(sql_get_user_by_id, (id,))
+        row = c.fetchone()
+
+    if row:
+        return make_user(row)
+    else:
+        return None
+
+def authenticate(user):
+    pass
 
 def db_connect(db_path=DEFAULT_PATH):
     con = create_connection(db_path)
