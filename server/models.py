@@ -4,14 +4,14 @@ models.py
 """
 
 from datetime import datetime
-from flask_sqlalchemy import SQLAlchemy
+#from flask_sqlalchemy import SQLAlchemy
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
 ########################################
 
 class User:
-    def __init__(self, userId=0, email=None, firstname=None, lastname=None, password=None, dob=None, image=None):
+    def __init__(self, userId=0, email=None, password=None, firstname=None, lastname=None, dob=None, image=None):
         self.userId = userId
         self.email = email
         self.password = generate_password_hash(password, method='sha256')
@@ -19,6 +19,10 @@ class User:
         self.lastname = lastname        
         self.image = image
         self.dob = dob
+
+    @staticmethod
+    def authenticate(source, target):
+        return check_password_hash(source, target)
 
     def to_dict(self):
       return dict(userId=self.userId,

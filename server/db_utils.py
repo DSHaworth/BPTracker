@@ -9,7 +9,7 @@ https://www.sqlitetutorial.net/sqlite-python/create-tables/
 >>> from db_utils import db_connect
 >>> db_connect()
 ==================
->>> from db_utils import add_user_test, get_all_users_test, get_user_by_id_test
+>>> from db_utils import add_user_test, get_all_users_test, get_user_by_id_test, validate_user_test
 >>> add_user_test()
 
 """
@@ -63,19 +63,14 @@ sql_update_user_password = """
         WHERE 
             userId = ?"""
 
-sql_get_all_users = """
+sql_validate_user = """
     SELECT 
-        userId, email, firstname, lastname, image
-    FROM
-        users"""
-
-sql_get_user_by_id = """
-    SELECT 
-        userId, email, firstname, lastname, image
+        userId, email, password
     FROM
         users
     WHERE
-        userId=?"""        
+        email=?"""
+
 #endregion
 
 #region BP SQL
@@ -147,7 +142,7 @@ def create_table(conn, create_table_sql):
         print(e)
 
 def make_user(row):
-    return User(userId=row["userId"], email=row["email"], firstname=row["firstname"], lastname=row["lastname"], image=row["image"])
+    return User(userId=row["userId"], email=row["email"], firstname=row["firstname"], lastname=row["lastname"], dob=row["dob"], image=row["image"])
 
 ##### TESTS START ############
 def add_user_test():
@@ -160,11 +155,8 @@ def add_user_test():
     lastname=input("lastname: ")
     dob=input("dob: ")
 
-    user = User(email=email, password=password, firstname=firstname, lastname=lastname, dob=dob)
-    con = db_connect()
-    with closing(con.cursor()) as c:
-        c.execute(sql_insert_user, (user.email, user.password, user.firstname, user.lastname, user.dob, user.image))
-        con.commit()
+    user = add_user(User(email=email, password=password, firstname=firstname, lastname=lastname, dob=dob))
+    print(user)
 
 def get_all_users_test():
     users = get_all_users()
@@ -177,29 +169,70 @@ def get_user_by_id_test():
     if user:
         print(user.__dict__)
 
-##### TESTS START ############
+def validate_user_test():
+    email=input("email: ")
+    password=input("password: ")
+    user = validate_user(email=email, password=password)
+
+    if user:
+        print(user.__dict__)
+
+##### TESTS STOP #############
+def add_user(user):
+    con = db_connect()
+    with closing(con.cursor()) as c:
+        c.execute(sql_insert_user, (user.email, user.password, user.firstname, user.lastname, user.dob, user.image,))
+        con.commit()
+    return user
 
 def get_all_users():
     con = db_connect()
     with closing(con.cursor()) as c:
-        c.execute(sql_get_all_users)
+        c.execute("""
+    SELECT 
+        userId, email, firstname, lastname, image
+    FROM
+        users""")
         rows = c.fetchall()
 
     users = []
     for row in rows:
-        users.append(make_user(row))
+        users.append(User(userId=row["userId"], email=row["email"], firstname=row["firstname"], lastname=row["lastname"], image=row["image"]))
     return users
 
 def get_user_by_id(id):
     con = db_connect()
     with closing(con.cursor()) as c:
-        c.execute(sql_get_user_by_id, (id,))
+        c.execute("""
+    SELECT 
+        userId, email, firstname, lastname, image
+    FROM
+        users
+    WHERE
+        userId=?""", (id,))
         row = c.fetchone()
 
     if row:
-        return make_user(row)
+        return User(userId=row["userId"], email=row["email"], firstname=row["firstname"], lastname=row["lastname"], image=row["image"])
     else:
         return None
+
+def validate_user(email, password):
+
+    con = db_connect()
+    with closing(con.cursor()) as c:
+        c.execute(sql_validate_user, (email,))
+        row = c.fetchone()
+
+    if row:
+        if User.authenticate(row["password"], password):
+            return get_user_by_id(row["userId"])
+        else:
+            return None
+    else:
+        return None
+
+#################################
 
 def authenticate(user):
     pass
@@ -214,3 +247,11 @@ def db_connect(db_path=DEFAULT_PATH):
         print("Error! cannot create the database connection.")
 
     return con
+
+
+def main():    
+    get_all_users_test()
+    validate_user_test()
+
+if __name__ == "__main__":
+    main()
