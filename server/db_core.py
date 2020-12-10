@@ -9,7 +9,7 @@ class DB_core:
     dbFileName = "bptracker.sqlite3"
     DEFAULT_PATH = os.path.join(os.path.dirname(__file__), dbFileName)
 
-    sql_create_users_table = """ 
+    sql_create_table_users = """ 
         CREATE TABLE IF NOT EXISTS users(
             userId INTEGER PRIMARY KEY,
             email TEXT NOT NULL UNIQUE,
@@ -20,15 +20,37 @@ class DB_core:
             image TEXT 
         );"""
 
-    sql_create_bpstats_table = """ 
+    sql_create_table_bpstats = """ 
         CREATE TABLE IF NOT EXISTS bpstats(
             bpStatId INTEGER PRIMARY KEY,
             userId INTEGER NOT NULL,
             sys INTEGER NOT NULL,
             dia INTEGER NOT NULL,
-            pulse INTEGER NOT NULL,
-            bpTaken TEXT NOT NULL,
             position TEXT NOT NULL,
+            activity TEXT NOT NULL,
+            notes TEXT NULL,
+            recordDateTime TEXT NOT NULL,
+            FOREIGN KEY (userId) REFERENCES users (userId)
+        );"""
+
+    sql_create_table_pulse = """ 
+        CREATE TABLE IF NOT EXISTS pulse(
+            pulseId INTEGER PRIMARY KEY,
+            userId INTEGER NOT NULL,
+            pulse INTEGER NOT NULL,
+            activity TEXT NOT NULL,
+            notes TEXT NULL,
+            recordDateTime TEXT NOT NULL,
+            FOREIGN KEY (userId) REFERENCES users (userId)
+        );"""
+
+    sql_create_table_weight = """ 
+        CREATE TABLE IF NOT EXISTS weight(
+            weightId INTEGER PRIMARY KEY,
+            userId INTEGER NOT NULL,
+            weight REAL NOT NULL,    
+            notes TEXT NULL,
+            recordDateTime TEXT NOT NULL,
             FOREIGN KEY (userId) REFERENCES users (userId)
         );"""
 
@@ -63,14 +85,15 @@ class DB_core:
         except Error as e:
             print(e)
 
-
     @classmethod
     def connect(cls, db_path=DEFAULT_PATH):
         con = cls.create_connection(db_path)
 
         if con is not None:
-            cls.create_table(con, cls.sql_create_users_table)
-            cls.create_table(con, cls.sql_create_bpstats_table)
+            cls.create_table(con, cls.sql_create_table_users)
+            cls.create_table(con, cls.sql_create_table_bpstats)
+            cls.create_table(con, cls.sql_create_table_pulse)
+            cls.create_table(con, cls.sql_create_table_weight)
         else:
             print("Error! cannot create the database connection.")
 

@@ -1,15 +1,16 @@
 """
 models.py
 - Data classes for the surveyapi application
+
+datetime_format = "%Y-%m-%d %H:%M:%S"
+date_time_str = datetime.utcnow().strftime(datetime_format) 
+date_time_obj = datetime.strptime(date_time_str, datetime_format)
 """
 
 from datetime import datetime
-#from flask_sqlalchemy import SQLAlchemy
-
 from werkzeug.security import generate_password_hash, check_password_hash
 
 ########################################
-
 class User:
     def __init__(self, userId=0, email=None, password=None, firstname=None, lastname=None, dob=None, image=None):
         self.userId = userId
@@ -34,18 +35,56 @@ class User:
                   dob=self.dob)
 
 class BPStat:
-
-    def __init(self, bpStatId=0, userId=0, sys=0, dia=0, pulse=0, bpTaken=None, position=None):
+    def __init(self, bpStatId=0, userId=0, sys=0, dia=0, position=None, activity=None, notes=None, recordDateTime=datetime.utcnow()):
         self.bpStatId = bpStatId
         self.userId = userId
         self.sys = sys
         self.dia = dia
-        self.pulse = pulse
-        self.bpTaken = bpTaken
         self.position = position
+        self.activity = activity
+        self.notes = notes
+        self.recordDateTime = recordDateTime.strftime("%Y-%m-%d %H:%M:%S")
 
-    # def to_dict(self):
-    #   return dict(id=self.bpStatId,
-    #               name=self.name,
-    #               created_at=self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-    #               questions=[question.to_dict() for question in self.questions])
+    def to_dict(self):
+      return dict( bpStatId = self.bpStatId,
+                   userId = self.userId,
+                   sys = self.sys,
+                   dia = self.dia,
+                   position = self.position,
+                   activity = self.activity,
+                   notes = self.notes,
+                   recordDateTime = self.recordDateTime)
+                  #created_at=self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                  #questions=[question.to_dict() for question in self.questions])
+
+class Pulse:
+    def __init(self, pulseId=0, userId=0, pulse=0, activity=None, notes=None, recordDateTime=datetime.utcnow()):
+        self.pulseId = pulseId
+        self.userId = userId
+        self.pulse = pulse
+        self.activity = activity
+        self.notes = notes
+        self.recordDateTime = recordDateTime.strftime("%Y-%m-%d %H:%M:%S")
+
+    def to_dict(self):
+      return dict( pulseId = self.pulseId,
+                   userId = self.userId,
+                   pulse = self.pulse,
+                   activity = self.activity,
+                   notes = self.notes,
+                   recordDateTime = self.recordDateTime) 
+
+class Weight:
+    def __init(self, weightId=0, userId=0, weight=0, notes=None, recordDateTime=datetime.utcnow()):
+        self.weightId = weightId
+        self.userId = userId
+        self.weight = weight
+        self.notes = notes
+        self.recordDateTime = recordDateTime.strftime("%Y-%m-%d %H:%M:%S")
+
+    def to_dict(self):
+      return dict( weightId = self.weightId,
+                   userId = self.userId,
+                   weight = self.weight,
+                   notes = self.notes,
+                   recordDateTime = self.recordDateTime)                    

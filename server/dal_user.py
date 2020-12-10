@@ -4,24 +4,6 @@ from models import User
 
 class DAL_user:
 
-    sql_update_user = """
-        UPDATE users 
-            SET 
-                email = ?, 
-                firstname = ?, 
-                lastname = ?, 
-                dob = ?, 
-                image = ?
-            WHERE 
-                userId = ?"""
-
-    sql_update_user_password = """
-        UPDATE users 
-            SET 
-                password = ?            
-            WHERE 
-                userId = ?"""
-
     @classmethod
     def add_user(cls, user):
         con = DB_core.connect()
@@ -89,6 +71,36 @@ class DAL_user:
                 return None
         else:
             return None
+
+    @classmethod
+    def update_user(cls, user):
+        con = DB_core.connect()
+        with closing(con.cursor()) as c:
+            c.execute("""
+        UPDATE users 
+            SET 
+                email = ?, 
+                firstname = ?, 
+                lastname = ?, 
+                dob = ?, 
+                image = ?
+            WHERE 
+                userId = ?""", (user.email, user.firstname, user.lastname, user.dob, user.image, user.userId))
+            con.commit()
+        return user
+
+    @classmethod
+    def update_user_password(cls, user):
+        con = DB_core.connect()
+        with closing(con.cursor()) as c:
+            c.execute("""
+        UPDATE users 
+            SET 
+                password = ?            
+            WHERE 
+                userId = ?""", (user.password, user.userId))
+            con.commit()
+        return user
 
     @classmethod
     def make_user(cls, row):
