@@ -38,3 +38,57 @@ Follow tutorial at [Create Tables](https://www.sqlitetutorial.net/sqlite-python/
 
 Follow tutorial at [flask-jwt-extended](https://flask-jwt-extended.readthedocs.io/en/stable/)
 GitHub for [flask-jwt-extended](https://github.com/vimalloc/flask-jwt-extended/tree/1fec4dc22fe97fd3bf579548079543a8c0b61e3e)
+
+## Client App
+### VueJS
+
+#### [Installation:](https://cli.vuejs.org/guide/installation.html)
+
+    $ npm install -g @vue/cli
+
+#### Create VueJS Project
+
+    $ vue create client
+
+#### Launch VueJS Project
+
+    $ npm run serve
+
+#### Adding FontAwesome
+
+    $ npm install --save @fortawesome/fontawesome-free
+
+* Create **styles** folder under **src**
+* Create **custom.scss** under new **styles**
+
+*client\src\styles\custom.scss*
+
+    // npm install --save @fortawesome/fontawesome-free
+    $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
+    @import '~@fortawesome/fontawesome-free/scss/fontawesome.scss';
+    @import '~@fortawesome/fontawesome-free/scss/regular.scss';
+
+*client\src\main.js*
+
+    import './styles/custom.scss';
+
+#### Adding [Vue-Material](https://vuematerial.io/)
+
+    client> npm install vue-material --save
+
+*client\src\main.js*
+
+    import { MdButton, MdContent, MdTabs } from 'vue-material/dist/components'
+    import 'vue-material/dist/vue-material.min.css'
+    import 'vue-material/dist/theme/default.css'
+
+    Vue.use(MdButton)
+
+
+#### Adding Validators
+
+    $ npm install vuelidate --save
+
+#### Add Axios
+
+    $ npm install axios
