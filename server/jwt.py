@@ -1,5 +1,7 @@
 """
 https://github.com/davedoesdev/python-jwt
+https://pypi.org/project/python-jwt/
+https://rawgit-now.netlify.app/davedoesdev/python-jwt/master/docs/_build/html/index.html
 """
 import python_jwt as jwt, jwcrypto.jwk as jwk, datetime
 
