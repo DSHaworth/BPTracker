@@ -12,7 +12,7 @@
       <template v-else>
         <span class="md-display-3">Currently no users</span>
       </template>
-      <div><md-button class="md-raised md-primary">Create Account</md-button></div>
+      <div><md-button to="/NewUser" class="md-raised md-primary">Create Account</md-button></div>
     </template>   
 
     <loading-dialog msg="Getting Records" v-bind:showDialog="loading" />

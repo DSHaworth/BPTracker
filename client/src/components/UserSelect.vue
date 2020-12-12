@@ -1,7 +1,10 @@
 <template>
-    <div class="initials">
+    <md-button class="md-fab md-primary">
         {{user.firstname[0]}}{{user.lastname[0]}}
-    </div>
+    </md-button>
+    <!-- <div class="initials">
+        {{user.firstname[0]}}{{user.lastname[0]}}
+    </div> -->
 </template>
 
 <script>
@@ -17,6 +20,12 @@ export default {
 </script>
 
 <style scoped lang="scss">
+
+.md-button.md-theme-default.md-primary{
+    color: #ffff;
+    font-size: 1.8rem;
+}
+
 //https://codepen.io/AllThingsSmitty/pen/dWmmQp
 $container_size: 5rem;
 $font_size: 2.5rem;
