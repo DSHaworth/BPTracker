@@ -52,11 +52,10 @@ sql_get_bpstats_by_userId = """
         userId=?"""
 #endregion
 
-
 def main():    
     DAL_user.get_all_users_test()
-    # add_user_test()
-    DAL_user.validate_user_test()
+    #DAL_user.add_user_test()
+    #DAL_user.validate_user_test()
 
 if __name__ == "__main__":
     main()

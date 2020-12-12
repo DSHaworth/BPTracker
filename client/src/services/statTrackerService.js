@@ -3,7 +3,7 @@
 
 import axios from 'axios';
 
-let baseUrl = "http://localhost:5000/bptracker/api/v1";
+let baseUrl = "http://localhost:5000/stattracker/api/v1";
 let axiosInstance = null;
 
 export default new class {
@@ -16,16 +16,16 @@ export default new class {
     }
 
     //#region Students
-    getStudents(){
-        return axiosInstance("/students");
+    getUsers(){
+        return axiosInstance("/users");
     }
 
-    getStudents(id){
-        return axiosInstance(`/students/${id}`);
+    getUserById(id){
+        return axiosInstance(`/users/${id}`);
     }
 
     saveStudent(item){
-        return axiosInstance.post("/students", item);
+        return axiosInstance.post("/users", item);
     }
     //#endregion
 

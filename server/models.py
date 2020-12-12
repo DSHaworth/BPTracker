@@ -15,7 +15,7 @@ class User:
     def __init__(self, userId=0, email=None, password=None, firstname=None, lastname=None, dob=None, image=None):
         self.userId = userId
         self.email = email
-        self.password = generate_password_hash(password, method='sha256')
+        self.password = generate_password_hash(password, method='sha256') if password else None
         self.firstname = firstname
         self.lastname = lastname        
         self.image = image

@@ -31,6 +31,8 @@ The **server** folder is for the Python code.
 
 
     > pip install python_jwt
+    > pip install -U Flask 
+    > pip install -U flask-cors
 
 
 Follow tutorial at [VueJS Flask](https://stackabuse.com/single-page-apps-with-vue-js-and-flask-jwt-authentication/).

@@ -29,7 +29,7 @@ class DAL_user:
 
         users = []
         for row in rows:
-            users.append(User(userId=row["userId"], email=row["email"], firstname=row["firstname"], lastname=row["lastname"], image=row["image"]))
+            users.append(User(userId=row["userId"], email=row["email"], firstname=row["firstname"], lastname=row["lastname"], image=row["image"]).to_dict())
         return users        
 
     @classmethod
