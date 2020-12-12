@@ -35,6 +35,9 @@ The **server** folder is for the Python code.
     > pip install -U flask-cors
 
 
+[SQLite3 One to many](https://www.digitalocean.com/community/tutorials/how-to-use-one-to-many-database-relationships-with-flask-and-sqlite)
+[How to use One-to-many](https://www.digitalocean.com/community/tutorials/how-to-use-one-to-many-database-relationships-with-flask-and-sqlite)
+
 Follow tutorial at [VueJS Flask](https://stackabuse.com/single-page-apps-with-vue-js-and-flask-jwt-authentication/).
 Follow tutorial at [Create Tables](https://www.sqlitetutorial.net/sqlite-python/create-tables/).
 
