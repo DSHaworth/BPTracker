@@ -20,8 +20,8 @@ export default new class {
         return axiosInstance("/users");
     }
 
-    getUserById(id){
-        return axiosInstance(`/users/${id}`);
+    getUserById(userId){
+        return axiosInstance(`/users/${userId}`);
     }
 
     saveStudent(item){

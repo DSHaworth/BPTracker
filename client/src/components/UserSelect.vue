@@ -1,10 +1,7 @@
 <template>
-    <md-button class="md-fab md-primary">
+    <md-button class="md-fab md-primary" :to="'viewuser/' + user.userId">
         {{user.firstname[0]}}{{user.lastname[0]}}
     </md-button>
-    <!-- <div class="initials">
-        {{user.firstname[0]}}{{user.lastname[0]}}
-    </div> -->
 </template>
 
 <script>
@@ -27,6 +24,13 @@ export default {
 }
 
 //https://codepen.io/AllThingsSmitty/pen/dWmmQp
+/*
+    <!-- <div class="initials">
+        {{user.firstname[0]}}{{user.lastname[0]}}
+    </div> -->
+*/
+
+
 $container_size: 5rem;
 $font_size: 2.5rem;
 

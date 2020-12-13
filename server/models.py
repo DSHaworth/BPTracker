@@ -12,18 +12,15 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 ########################################
 class User:
-    def __init__(self, userId=0, email=None, password=None, firstname=None, lastname=None, dob=None, image=None):
+    def __init__(self, userId=0, email=None, password=None, firstname=None, lastname=None, dob=None, gender=None, image=None):
         self.userId = userId
         self.email = email
         self.password = generate_password_hash(password, method='sha256') if password else None
         self.firstname = firstname
         self.lastname = lastname        
-        self.image = image
         self.dob = dob
-
-    @staticmethod
-    def authenticate(source, target):
-        return check_password_hash(source, target)
+        self.gender = gender
+        self.image = image
 
     def to_dict(self):
       return dict(userId=self.userId,
@@ -31,8 +28,13 @@ class User:
                   password=self.password,
                   firstname=self.firstname,
                   lastname=self.lastname,
-                  image=self.image,
-                  dob=self.dob)
+                  dob=self.dob,
+                  gender=self.gender,
+                  image=self.image)
+
+    @staticmethod
+    def authenticate(source, target):
+        return check_password_hash(source, target)
 
 class BPStat:
     def __init(self, bpStatId=0, userId=0, sys=0, dia=0, position=None, activity=None, notes=None, recordDateTime=datetime.utcnow()):

@@ -46,7 +46,7 @@ class DAL_user:
             row = c.fetchone()
 
         if row:
-            return User(userId=row["userId"], email=row["email"], firstname=row["firstname"], lastname=row["lastname"], image=row["image"])
+            return User(userId=row["userId"], email=row["email"], firstname=row["firstname"], lastname=row["lastname"], image=row["image"]).to_dict()
         else:
             return None
 

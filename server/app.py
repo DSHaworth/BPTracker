@@ -28,19 +28,20 @@ def requestJsonPropInvalid(request, prop):
 def get_students():
     users = DAL_user.get_all_users()
     for user in users:
-        print(type(user))
-        print(user)
-        del user["dob"]
         del user["password"]
-
+        del user["dob"]
+        del user["gender"]
     return jsonify(ResponseHandler(users).to_dict())
 
-# @app.route(f'{ROOT_PATH}/students/<int:task_id>', methods=['GET'])
-# def get_student(task_id):
-#     student = list(filter(lambda t: t['id'] == task_id, students))
-#     if len(student) == 0:
-#         return ResponseHandler(errorMessage = "Record not found").toJSON()
-#     return ResponseHandler(payload=student[0]).toJSON()
+@app.route(f'{ROOT_PATH}/users/<int:user_id>', methods=['GET'])
+def get_student(user_id):
+    user = DAL_user.get_user_by_id(user_id)
+    if user == None:
+        return jsonify(ResponseHandler(errorMessage = "Record not found").to_dict())
+    del user["password"]
+    del user["dob"]
+    del user["gender"]
+    return jsonify(ResponseHandler(user).to_dict())
 
 # @app.route(f'{ROOT_PATH}/students', methods=['POST'])
 # def save_student():
