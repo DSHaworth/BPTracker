@@ -24,15 +24,12 @@ export default new class {
         return axiosInstance(`/users/${userId}`);
     }
 
-    saveStudent(item){
-        return axiosInstance.post("/users", item);
-    }
-    //#endregion
-
-    //#region Authenticate
     authenticate(creds){
         return axiosInstance.post("/authenticate", creds);
     }
-    ////#endregion
 
+    // saveStudent(item){
+    //     return axiosInstance.post("/users", item);
+    // }
+    //#endregion
  }

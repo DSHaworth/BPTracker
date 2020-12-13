@@ -1,5 +1,5 @@
 <template>
-    <md-button class="md-fab md-primary" :to="'viewuser/' + user.userId">
+    <md-button class="md-fab md-primary" :to="'userpassword/' + user.userId">
         {{user.firstname[0]}}{{user.lastname[0]}}
     </md-button>
 </template>

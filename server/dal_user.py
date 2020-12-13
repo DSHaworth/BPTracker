@@ -51,7 +51,7 @@ class DAL_user:
             return None
 
     @classmethod
-    def validate_user(cls, email, password):
+    def validate_user(cls, userId, email, password):
 
         con = DB_core.connect()
         with closing(con.cursor()) as c:
@@ -61,7 +61,9 @@ class DAL_user:
                 FROM
                     users
                 WHERE
-                    email=?""", (email,))
+                    userId=?
+                AND
+                    email=?""", (userId, email,))
             row = c.fetchone()
 
         if row:
@@ -136,9 +138,10 @@ class DAL_user:
 
     @classmethod
     def validate_user_test(cls):
+        id = int(input("Id to fetch: "))
         email=input("email: ")
         password=input("password: ")
-        user = cls.validate_user(email=email, password=password)
+        user = cls.validate_user(userId=id, email=email, password=password)
 
         if user:
             print(user.__dict__)

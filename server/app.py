@@ -1,7 +1,7 @@
 # https://gist.github.com/miguelgrinberg/5614326
 # https://testdriven.io/blog/developing-a-single-page-app-with-flask-and-vuejs/
 
-from flask import Flask, request, url_for, jsonify
+from flask import Flask, request, url_for
 from flask_cors import CORS
 
 from response_handler import ResponseHandler
@@ -25,23 +25,50 @@ def requestJsonPropInvalid(request, prop):
 # Users
 ####################################################
 @app.route(f'{ROOT_PATH}/users', methods=['GET'])
-def get_students():
+def get_users():
     users = DAL_user.get_all_users()
     for user in users:
         del user["password"]
         del user["dob"]
         del user["gender"]
-    return jsonify(ResponseHandler(users).to_dict())
+    return ResponseHandler(users).jsonify()
 
 @app.route(f'{ROOT_PATH}/users/<int:user_id>', methods=['GET'])
-def get_student(user_id):
+def get_user(user_id):
     user = DAL_user.get_user_by_id(user_id)
-    if user == None:
-        return jsonify(ResponseHandler(errorMessage = "Record not found").to_dict())
-    del user["password"]
-    del user["dob"]
-    del user["gender"]
-    return jsonify(ResponseHandler(user).to_dict())
+    if user:
+        del user["password"]
+        del user["dob"]
+        del user["gender"]
+        return ResponseHandler(user).jsonify()
+    else:
+        return ResponseHandler(errorMessage = "Record not found").jsonify()
+
+@app.route(f'{ROOT_PATH}/authenticate', methods=['POST'])
+def authenticate():
+    if not request.json:
+        return ResponseHandler(errorMessage = "Object not submitted").jsonify()
+    if requestJsonPropInvalid(request, 'email'): 
+        return ResponseHandler(errorMessage = "Username cannot be empty").jsonify()
+    if requestJsonPropInvalid(request, 'password'): 
+        return ResponseHandler(errorMessage = "Password cannot be empty").jsonify()
+
+    user = DAL_user.validate_user(userId=request.json['userId'], email=request.json['email'], password=request.json['password'])
+    if user:
+        del user["password"]        
+        # Create Token
+        # Until Then
+        return ResponseHandler(user).jsonify()
+    else:
+        return ResponseHandler(errorMessage = "Incorrect username or password").jsonify()
+    
+
+
+    # authUser = {
+    #     'username': request.json['username'],
+    #     'roles': ['Admin']
+    #     # 'class': request.json.get('class', False)
+    # }
 
 # @app.route(f'{ROOT_PATH}/students', methods=['POST'])
 # def save_student():
@@ -63,23 +90,6 @@ def get_student(user_id):
 #     students.append(student)
 #     return ResponseHandler(student).toJSON()
 ####################################################
-
-# @app.route(f'{ROOT_PATH}/authenticate', methods=['POST'])
-# def authenticate():
-#     if not request.json:
-#         return ResponseHandler(errorMessage = "Object not submitted").to_JSON()
-#     if requestJsonPropInvalid(request, 'username'): 
-#         return ResponseHandler(errorMessage = "Username cannot be empty").to_JSON()
-#     if requestJsonPropInvalid(request, 'password'): 
-#         return ResponseHandler(errorMessage = "Password cannot be empty").to_JSON()
-
-#     authUser = {
-#         'username': request.json['username'],
-#         'roles': ['Admin']
-#         # 'class': request.json.get('class', False)
-#     }
-
-#     return ResponseHandler(authUser).to_JSON(), 200
 
 if __name__ == '__main__':
     app.run()

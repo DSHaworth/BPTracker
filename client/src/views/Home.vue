@@ -46,10 +46,12 @@ export default {
             console.log("Error")
             console.log(res);
             console.log(res.data.errorMessage);
+            alert(es.data.errorMessage);
           }
           })
           .catch((error) => {
               console.error(error);
+              alert(error);
           })
           .finally(() => {
             this.loading = false;
