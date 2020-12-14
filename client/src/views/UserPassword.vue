@@ -13,7 +13,7 @@
 
                             <md-field :class="getValidationClass('password')">
                                 <label for="password">Password</label>
-                                <md-input type="password" name="password" id="password" v-model="form.password" :disabled="sending" />
+                                <md-input type="password" ref="password" name="password" id="password" v-model="form.password" :disabled="sending" />
                                 <span class="md-error" v-if="!$v.form.password.required">The password is required</span>
                             </md-field>
                         </md-card-content>
@@ -110,9 +110,17 @@ export default {
                 .then((res) => {
                 if(res.data.isValid){
                     this.sbMessage = "Set Token, Redirect";
-                    console.log(res.data.payload);
+                    this.$router.push(`/UserStats/${this.user.userId}`);
+                    //console.log(res.data.payload);
                 } else {
                     this.sbMessage = res.data.errorMessage;
+                    this.clearForm();
+                    // this.$nextTick(() => {
+                    //     //document.getElementById('password').focus();
+                    //     console.log(this.$refs.password)
+                    //     console.log(this.$refs.password.$el.focus());
+                    //     //this.$refs.password.focus()
+                    // });
                 }
                 })
                 .catch((error) => {
