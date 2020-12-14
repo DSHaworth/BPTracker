@@ -46,12 +46,8 @@ def get_user(user_id):
 
 @app.route(f'{ROOT_PATH}/authenticate', methods=['POST'])
 def authenticate():
-    if not request.json:
-        return ResponseHandler(errorMessage = "Object not submitted").jsonify()
-    if requestJsonPropInvalid(request, 'email'): 
-        return ResponseHandler(errorMessage = "Username cannot be empty").jsonify()
-    if requestJsonPropInvalid(request, 'password'): 
-        return ResponseHandler(errorMessage = "Password cannot be empty").jsonify()
+    if not request.json or requestJsonPropInvalid(request, 'userId') or requestJsonPropInvalid(request, 'email') or requestJsonPropInvalid(request, 'password'): 
+        return ResponseHandler(errorMessage = "Something went wrong, please try again.").jsonify()
 
     user = DAL_user.validate_user(userId=request.json['userId'], email=request.json['email'], password=request.json['password'])
     if user:
@@ -61,8 +57,6 @@ def authenticate():
         return ResponseHandler(user).jsonify()
     else:
         return ResponseHandler(errorMessage = "Incorrect username or password").jsonify()
-    
-
 
     # authUser = {
     #     'username': request.json['username'],
