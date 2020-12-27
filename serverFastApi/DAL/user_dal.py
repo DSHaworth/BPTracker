@@ -19,8 +19,6 @@ class user_DAL:
     @classmethod
     def get_all_users(cls):
 
-        print("GET ALL USERS")
-
         con = DB_core.connect()
         with closing(con.cursor()) as c:
             c.execute("""
@@ -31,7 +29,6 @@ class user_DAL:
             rows = c.fetchall()
 
         users = []
-
         for row in rows:            
             current_row_data = {
                 "userId": row["userId"], 
@@ -41,13 +38,7 @@ class user_DAL:
                 "image": row["image"],
                 "dob": row["dob"]
             }
-            print("Current Row Data")
-            print(current_row_data)
-
             users.append(UserOutClean.parse_obj(current_row_data))
-        
-        print("Users from DB")
-        print(users)
         
         return users        
 
@@ -57,7 +48,7 @@ class user_DAL:
         with closing(con.cursor()) as c:
             c.execute("""
                 SELECT 
-                    userId, email, firstname, lastname, image
+                    userId, email, firstname, lastname, image, dob
                 FROM
                     users
                 WHERE
@@ -65,7 +56,15 @@ class user_DAL:
             row = c.fetchone()
 
         if row:
-            return UserOutClean(userId=row["userId"], email=row["email"], firstname=row["firstname"], lastname=row["lastname"], image=row["image"]).to_dict()
+            current_row_data = {
+                "userId": row["userId"], 
+                "email": row["email"], 
+                "firstname": row["firstname"], 
+                "lastname": row["lastname"], 
+                "image": row["image"],
+                "dob": row["dob"]
+            }
+            return UserOutClean.parse_obj(current_row_data)
         else:
             return None
 
