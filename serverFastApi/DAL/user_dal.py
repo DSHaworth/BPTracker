@@ -1,10 +1,8 @@
 from contextlib import closing
-from db_core import DB_core
-from models.User import UserIn, UserOut
+from .db_core import DB_core
+from models.User import UserIn, UserOutClean
 
-class DAL_user:
-
-    dbFileName = "../../server/"
+class user_DAL:
 
     # @classmethod
     # def add_user(cls, user):
@@ -20,18 +18,37 @@ class DAL_user:
 
     @classmethod
     def get_all_users(cls):
+
+        print("GET ALL USERS")
+
         con = DB_core.connect()
         with closing(con.cursor()) as c:
             c.execute("""
                 SELECT 
-                    userId, email, firstname, lastname, image
+                    userId, email, firstname, lastname, image, dob
                 FROM
                     users""")
             rows = c.fetchall()
 
         users = []
-        for row in rows:
-            users.append(User(userId=row["userId"], email=row["email"], firstname=row["firstname"], lastname=row["lastname"], image=row["image"]).to_dict())
+
+        for row in rows:            
+            current_row_data = {
+                "userId": row["userId"], 
+                "email": row["email"], 
+                "firstname": row["firstname"], 
+                "lastname": row["lastname"], 
+                "image": row["image"],
+                "dob": row["dob"]
+            }
+            print("Current Row Data")
+            print(current_row_data)
+
+            users.append(UserOutClean.parse_obj(current_row_data))
+        
+        print("Users from DB")
+        print(users)
+        
         return users        
 
     @classmethod
@@ -48,7 +65,7 @@ class DAL_user:
             row = c.fetchone()
 
         if row:
-            return User(userId=row["userId"], email=row["email"], firstname=row["firstname"], lastname=row["lastname"], image=row["image"]).to_dict()
+            return UserOutClean(userId=row["userId"], email=row["email"], firstname=row["firstname"], lastname=row["lastname"], image=row["image"]).to_dict()
         else:
             return None
 

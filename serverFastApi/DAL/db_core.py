@@ -7,7 +7,12 @@ class DB_core:
     # create a default path to connect to and create (if necessary) a database
     # called 'database.sqlite3' in the same directory as this script
     dbFileName = "bptracker.sqlite3"
-    DEFAULT_PATH = os.path.join(os.path.dirname(__file__), dbFileName)
+
+    #https://stackoverflow.com/questions/918154/relative-paths-in-python
+    dirname = os.path.dirname(__file__)
+    DEFAULT_PATH = os.path.join(dirname, f'../../server/{dbFileName}')
+
+    #DEFAULT_PATH = os.path.join(os.path.dirname(__file__), dbFileName)
 
     sql_create_table_users = """ 
         CREATE TABLE IF NOT EXISTS users(

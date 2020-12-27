@@ -6,11 +6,12 @@ class UserIn(BaseModel):
     email: str
     full_name: Optional[str] = None
 
-class UserOut(BaseModel):
+class UserOutClean(BaseModel):
     userId: str
     email: str
     firstname: str
     lastname: str
-    dob: Optional[str] = None
-    gender: Optional[str] = None
     image: Optional[str] = None
+    # dob: Optional[str] = None
+    # gender: Optional[str] = None
+    
