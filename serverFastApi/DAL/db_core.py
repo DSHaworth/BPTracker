@@ -9,10 +9,11 @@ class DB_core:
     dbFileName = "bptracker.sqlite3"
 
     #https://stackoverflow.com/questions/918154/relative-paths-in-python
-    dirname = os.path.dirname(__file__)
-    DEFAULT_PATH = os.path.join(dirname, f'../../server/{dbFileName}')
-
-    #DEFAULT_PATH = os.path.join(os.path.dirname(__file__), dbFileName)
+    if False:
+        dirname = os.path.dirname(__file__)
+        DEFAULT_PATH = os.path.join(dirname, f'../../server/{dbFileName}')
+    else:
+        DEFAULT_PATH = os.path.join(os.path.dirname(__file__), dbFileName)
 
     sql_create_table_users = """ 
         CREATE TABLE IF NOT EXISTS users(

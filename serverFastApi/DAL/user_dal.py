@@ -1,20 +1,21 @@
 from contextlib import closing
 from .db_core import DB_core
+from utils.pwd_helper import Pwd_Helper
 from models.User import UserLogon, UserOutClean
 
 class user_DAL:
 
-    # @classmethod
-    # def add_user(cls, user):
-    #     con = DB_core.connect()
-    #     with closing(con.cursor()) as c:
-    #         c.execute("""
-    #             INSERT INTO users 
-    #                 (email, password, firstname, lastname, dob, image)
-    #             VALUES
-    #                 (?, ?, ?, ?, ?, ?)""", (user.email, user.password, user.firstname, user.lastname, user.dob, user.image,))
-    #         con.commit()
-    #     return user
+    @classmethod
+    def add_user(cls, user):
+        con = DB_core.connect()
+        with closing(con.cursor()) as c:
+            c.execute("""
+                INSERT INTO users 
+                    (email, password, firstname, lastname, dob, image)
+                VALUES
+                    (?, ?, ?, ?, ?, ?)""", (user.email, user.password, user.firstname, user.lastname, user.dob, user.image,))
+            con.commit()
+        return user
 
     @classmethod
     def get_all_users(cls):
@@ -85,10 +86,12 @@ class user_DAL:
             row = c.fetchone()
 
         if row:
-            # if User.authenticate(row["password"], password):
+            print("row found")
+            if Pwd_Helper.verify_password(userLogon.password, row["password"]):
+                print("Verfied...return user")
                 return cls.get_user_by_id(row["userId"])
-            # else:
-            #     return None
+            else:
+                return None
         else:
             return None
 

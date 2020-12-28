@@ -6,6 +6,16 @@ class UserLogon(BaseModel):
     email: str
     userId: int
 
+class UserCreateDto(BaseModel):
+    email: str
+    firstname: str
+    lastname: str
+    gender: str
+    dob: str
+    password: str
+    confirmPassword: str
+    image: Optional[str] = None
+
 class UserOutClean(BaseModel):
     userId: int
     email: str

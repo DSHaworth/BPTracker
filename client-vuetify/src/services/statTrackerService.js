@@ -24,6 +24,10 @@ export default new class {
         return axiosInstance(`/users/${userId}`);
     }
 
+    createUser(user){
+        return axiosInstance.post("/users", user);
+    }
+
     authenticate(creds){
         return axiosInstance.post("/authenticate", creds);
     }

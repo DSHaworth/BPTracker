@@ -27,7 +27,7 @@
       </v-card-text>
       <v-card-actions style="display: flex; flex-flow: row wrap; justify-content: flex-end;">
         <div>
-          <v-btn to="/NewUser" elevation="2" raised>
+          <v-btn @click="onShowCreate" elevation="2" raised>
             Create Account
           </v-btn>
         </div>
@@ -35,6 +35,7 @@
     </v-card>
     <!-- <loading-dialog msg="Getting Records" v-bind:loading="loading" /> -->
     <user-password-dialog :showLogonDialog="showLogonDialog" :user="selectedUser" v-on:close-logon="onCloseLogon"/>
+    <user-create-dialog :showCreateDialog="showCreateDialog" v-on:close-create="onCloseCreate"/>
   </div>
 </template>
 
@@ -44,6 +45,7 @@ import statTrackerService from '@/services/statTrackerService'
 //import LoadingDialog from '@/components/LoadingDialog.vue'
 import UserLogonAvatar from '@/components/UserLogonAvatar.vue'
 import UserPasswordDialog from '@/components/UserPasswordDialog.vue'
+import UserCreateDialog from '@/components/UserCreateDialog.vue'
 
 export default {
   name: 'Home',
@@ -51,6 +53,7 @@ export default {
     return {
       loading: false,
       showLogonDialog: false,
+      showCreateDialog: false,
       selectedUser: null,
       users: []
     }
@@ -77,11 +80,19 @@ export default {
     },
     onCloseLogon: function(){
       this.showLogonDialog = false;
+    },
+    // Create User
+    onShowCreate: function(){
+      this.showCreateDialog = true
+    },
+    onCloseCreate: function(){
+      this.showCreateDialog = false
     }
   },    
   components: {
     UserLogonAvatar,
-    UserPasswordDialog
+    UserPasswordDialog,
+    UserCreateDialog
   },
   created() {
     this.getUsers();

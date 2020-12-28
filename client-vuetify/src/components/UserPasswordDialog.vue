@@ -9,7 +9,7 @@
           <v-form ref="form" v-model="valid">
             <v-row>
               <v-col cols="12">
-                <v-text-field label="Password*" type="password" v-model="form.password" :rules="passwordRules" required></v-text-field>
+                <v-text-field label="Password*" type="password" v-model="form.password" :rules="rules.password" required></v-text-field>
               </v-col>
             </v-row>
           </v-form>
@@ -43,17 +43,21 @@ export default {
       form: {
         password: ''
       },
-      passwordRules: [
-        v => !!v || 'Password is required',
-        v => v.length >= 4 || 'Password must be at least 4 characters',        
-      ],
+      rules: {
+        password: [
+          v => !!v || 'Password is required',
+          v => (v && v.length >= 4) || 'Password must be at least 4 characters',        
+        ],
+      },
       valid: false,
       loading: false
     }
   },
   methods: {
     closeDialog: function(){
-      this.$emit('close-logon')
+      this.$refs.form.reset();
+      this.$emit('close-logon');
+
     },
     authenticate () {
 
@@ -62,9 +66,7 @@ export default {
         this.loading = true;
         window.setTimeout(() => {
           this.loading = false;
-          this.$emit('close-logon')
-        //     this.userSaved = true        
-        //     this.clearForm()
+          this.closeDialog();
         }, 1500)
         return;
       }
