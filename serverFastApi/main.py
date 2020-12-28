@@ -5,7 +5,7 @@ from typing import List
 #https://stackoverflow.com/questions/4383571/importing-files-from-different-folder
 #from application.app.folder.file import func_name
 from models.User import UserIn, UserOutClean
-from DAL.user_DAL import user_DAL
+from DAL.user_dal import user_DAL
 
 # configuration
 DEBUG = True

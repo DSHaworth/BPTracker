@@ -14,7 +14,7 @@
             <template>
               <v-row justify="space-around">
                 <template v-for="u in users">
-                  <userLogonAvatar :user="u" :key="u.userId"></userLogonAvatar>
+                  <userLogonAvatar :user="u" :key="u.userId" v-on:selected-user="onSelectedUser"></userLogonAvatar>
                 </template>
               </v-row>
             </template>
@@ -34,6 +34,7 @@
       </v-card-actions>
     </v-card>
     <!-- <loading-dialog msg="Getting Records" v-bind:loading="loading" /> -->
+    <user-password-dialog v-bind:showLogonDialog="showLogonDialog"/>
   </div>
 </template>
 
@@ -42,12 +43,14 @@
 import statTrackerService from '@/services/statTrackerService'
 //import LoadingDialog from '@/components/LoadingDialog.vue'
 import UserLogonAvatar from '@/components/UserLogonAvatar.vue'
+import UserPasswordDialog from '@/components/UserPasswordDialog.vue'
 
 export default {
   name: 'Home',
   data() { 
     return {
       loading: false,
+      showLogonDialog: false,
       users: []
     }
   },
@@ -66,10 +69,16 @@ export default {
           .finally(() => {
             this.loading = false;
           });
-        }
+        },
+    onSelectedUser: function(user){
+      console.log("Selected User");
+      console.log(user);
+      this.showLogonDialog = true;
+    }
   },    
   components: {
-    UserLogonAvatar
+    UserLogonAvatar,
+    UserPasswordDialog
   },
   created() {
     this.getUsers();

@@ -1,5 +1,5 @@
 <template>
-    <v-btn fab :to="'userpassword/' + user.userId">
+    <v-btn fab v-on:click="$emit('selected-user', user)">
         {{user.firstname[0]}}{{user.lastname[0]}}
     </v-btn>
 </template>
