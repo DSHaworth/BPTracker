@@ -34,7 +34,7 @@
       </v-card-actions>
     </v-card>
     <!-- <loading-dialog msg="Getting Records" v-bind:loading="loading" /> -->
-    <user-password-dialog v-bind:showLogonDialog="showLogonDialog"/>
+    <user-password-dialog :showLogonDialog="showLogonDialog" :user="selectedUser" v-on:close-logon="onCloseLogon"/>
   </div>
 </template>
 
@@ -51,6 +51,7 @@ export default {
     return {
       loading: false,
       showLogonDialog: false,
+      selectedUser: null,
       users: []
     }
   },
@@ -62,18 +63,20 @@ export default {
           if(res.data){
             this.users = res.data;
           } 
-          })
-          .catch((error) => {
-              alert(error);
-          })
-          .finally(() => {
-            this.loading = false;
-          });
-        },
+        })
+        .catch((error) => {
+            alert(error);
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
     onSelectedUser: function(user){
-      console.log("Selected User");
-      console.log(user);
+      this.selectedUser = user;
       this.showLogonDialog = true;
+    },
+    onCloseLogon: function(){
+      this.showLogonDialog = false;
     }
   },    
   components: {

@@ -1,13 +1,13 @@
 from typing import Optional
 from pydantic import BaseModel
 
-class UserIn(BaseModel):
+class UserLogon(BaseModel):
     password: str
     email: str
-    full_name: Optional[str] = None
+    userId: int
 
 class UserOutClean(BaseModel):
-    userId: str
+    userId: int
     email: str
     firstname: str
     lastname: str

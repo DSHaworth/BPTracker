@@ -4,7 +4,7 @@ from typing import List
 
 #https://stackoverflow.com/questions/4383571/importing-files-from-different-folder
 #from application.app.folder.file import func_name
-from models.User import UserIn, UserOutClean
+from models.User import UserLogon, UserOutClean
 from DAL.user_dal import user_DAL
 
 # configuration
@@ -46,3 +46,24 @@ async def get_user_by_id(user_id: int):
     if user == None:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
+@app.post(f'{ROOT_PATH}/authenticate')
+def authenticate(userLogon: UserLogon):
+    
+    user = user_DAL.validate_user(userLogon)
+    
+    return user
+
+
+
+    # if not request.json or requestJsonPropInvalid(request, 'userId') or requestJsonPropInvalid(request, 'email') or requestJsonPropInvalid(request, 'password'): 
+    #     return ResponseHandler(errorMessage = "Something went wrong, please try again.").jsonify()
+
+    # user = DAL_user.validate_user(userId=request.json['userId'], email=request.json['email'], password=request.json['password'])
+    # if user:
+    #     del user["password"]        
+    #     # Create Token
+    #     # Until Then
+    #     return ResponseHandler(user).jsonify()
+    # else:
+    #     return ResponseHandler(errorMessage = "Incorrect username or password").jsonify()    

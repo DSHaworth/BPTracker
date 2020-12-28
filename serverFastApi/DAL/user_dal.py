@@ -1,6 +1,6 @@
 from contextlib import closing
 from .db_core import DB_core
-from models.User import UserIn, UserOutClean
+from models.User import UserLogon, UserOutClean
 
 class user_DAL:
 
@@ -68,29 +68,29 @@ class user_DAL:
         else:
             return None
 
-    # @classmethod
-    # def validate_user(cls, userId, email, password):
+    @classmethod
+    def validate_user(cls, userLogon):
 
-    #     con = DB_core.connect()
-    #     with closing(con.cursor()) as c:
-    #         c.execute("""
-    #             SELECT 
-    #                 userId, email, password
-    #             FROM
-    #                 users
-    #             WHERE
-    #                 userId=?
-    #             AND
-    #                 email=?""", (userId, email,))
-    #         row = c.fetchone()
+        con = DB_core.connect()
+        with closing(con.cursor()) as c:
+            c.execute("""
+                SELECT 
+                    userId, email, password
+                FROM
+                    users
+                WHERE
+                    userId=?
+                AND
+                    email=?""", (userLogon.userId, userLogon.email,))
+            row = c.fetchone()
 
-    #     if row:
-    #         if User.authenticate(row["password"], password):
-    #             return cls.get_user_by_id(row["userId"])
-    #         else:
-    #             return None
-    #     else:
-    #         return None
+        if row:
+            # if User.authenticate(row["password"], password):
+                return cls.get_user_by_id(row["userId"])
+            # else:
+            #     return None
+        else:
+            return None
 
     # @classmethod
     # def update_user(cls, user):
