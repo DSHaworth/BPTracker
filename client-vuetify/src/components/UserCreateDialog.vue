@@ -25,13 +25,13 @@
 
             <v-row>
               <v-col cols="12" md="6">
-                <v-select v-model="form.gender" :items="['Male', 'Female']" label="Gender"></v-select>
+                <v-select v-model="form.gender" :items="['Male', 'Female']" label="Gender*"></v-select>
               </v-col>
 
               <v-col cols="12" md="6">                
                 <v-menu ref="menu" v-model="menu" :close-on-content-click="false" transition="scale-transition" offset-y min-width="290px">
                   <template v-slot:activator="{ on, attrs }">
-                    <v-text-field v-model="form.dob" label="Birthday date" prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on"></v-text-field>
+                    <v-text-field v-model="form.dob" label="Date of Birth*" prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on"></v-text-field>
                   </template>
                   <v-date-picker ref="picker" v-model="form.dob" :max="new Date().toISOString().substr(0, 10)" min="1950-01-01" @change="saveDob"></v-date-picker>
                 </v-menu> 
@@ -61,6 +61,16 @@
         </v-btn>
       </v-card-actions>
     </v-card>
+
+    <v-snackbar v-model="snackbar.show" :timeout="snackbar.timeout" :color="snackbar.color" top>
+      {{ snackbar.text }}
+      <template v-slot:action="{ attrs }">
+        <v-btn color="yellow" text v-bind="attrs" @click="snackbar.show = false" >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
+
   </v-dialog>
 </template>
 
@@ -96,6 +106,12 @@ export default {
           v => (v && /^[A-Za-z]+$/.test(v)) || 'Input must be valid',
         ]
       },
+      snackbar: {
+        show: false,
+        text: "",
+        timeout: 3000,
+        color: ""
+      },  
       menu: false,
       valid: false,
       loading: false
@@ -146,14 +162,19 @@ export default {
         .then((result) => {
           if(result){
               this.sbMessage = "Set Token, Redirect";
-              this.$router.push(`/UserStats/${this.user.userId}`);
+
+              this.snackbar.text = "User created";
+              this.snackbar.color_scheme = "success"
+              this.snackbar.show = true;
+
+              //this.$router.push(`/UserStats/${this.user.userId}`);
               //console.log(res.data.payload);
           }
         })
         .catch((error) => {
-            // this.sbMessage = res.error;
-            console.log(arguments);
-            console.log(error);
+          this.snackbar.text = error.response.data.detail;
+          this.snackbar.color = "red"
+          this.snackbar.show = true;
         })
         .finally(() => {
             this.loading = false;

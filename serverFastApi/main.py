@@ -60,7 +60,7 @@ async def create_user(user: UserCreateDto):
         user_DAL.add_user(user)
         return None
     except sqlite3.IntegrityError:
-        raise HTTPException(status_code=409, detail=f"{user.email} already exists")
+        raise HTTPException(status_code=409, detail=f"'{user.email}' already exists")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
     # validate_password = Pwd_Helper.verify_password(userCreate.password, hash_password)

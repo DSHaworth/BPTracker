@@ -86,9 +86,8 @@ class user_DAL:
             row = c.fetchone()
 
         if row:
-            print("row found")
-            if Pwd_Helper.verify_password(userLogon.password, row["password"]):
-                print("Verfied...return user")
+            pwd_verified = Pwd_Helper.verify_password(userLogon.password, row["password"])
+            if pwd_verified:
                 return cls.get_user_by_id(row["userId"])
             else:
                 return None

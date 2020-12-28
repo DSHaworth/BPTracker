@@ -26,6 +26,16 @@
         </v-btn>
       </v-card-actions>
     </v-card>
+
+    <v-snackbar v-model="snackbar.show" :timeout="snackbar.timeout" :color="snackbar.color" top>
+      {{ snackbar.text }}
+      <template v-slot:action="{ attrs }">
+        <v-btn color="yellow" text v-bind="attrs" @click="snackbar.show = false" >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
+
   </v-dialog>
 </template>
 
@@ -49,6 +59,12 @@ export default {
           v => (v && v.length >= 4) || 'Password must be at least 4 characters',        
         ],
       },
+      snackbar: {
+        show: false,
+        text: "",
+        timeout: 3000,
+        color: ""
+      },      
       valid: false,
       loading: false
     }
@@ -81,19 +97,16 @@ export default {
       statTrackerService.authenticate(creds)
           .then((result) => {
 
-            console.log("Logon result")
-            console.log(result);
-
-            // if(result.data.isValid){
+            this.$router.push(`/UserStats`);
             //     this.sbMessage = "Set Token, Redirect";
-            //     this.$router.push(`/UserStats/${this.user.userId}`);
+            //this.$router.push(`/UserStats/${this.user.userId}`);
             //     //console.log(res.data.payload);
-            // }
           })
           .catch((error) => {
-              // this.sbMessage = res.error;
-              alert(error);
-              console.log(error);
+              this.$refs.form.reset();
+              this.snackbar.text = error.response.data.detail;
+              this.snackbar.color = "red"
+              this.snackbar.show = true;
           })
           .finally(() => {
               this.loading = false;
