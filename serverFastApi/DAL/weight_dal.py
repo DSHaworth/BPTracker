@@ -31,12 +31,8 @@ class weight_DAL:
           userId=?""", (userId,))
       rows = c.fetchall()
 
-    print("rows")
-    print(rows)
-
-
     weights = []
-    for row in rows:            
+    for row in rows:   
       current_row_data = {
         "weightId": row["weightId"], 
         "userId": row["userId"], 
@@ -45,5 +41,4 @@ class weight_DAL:
         "recordDateTime": row["recordDateTime"]
       }
       weights.append(WeightDto.parse_obj(current_row_data))
-    
     return weights  

@@ -87,19 +87,20 @@ async def create_user(user: UserCreateDto):
     # validate_password = Pwd_Helper.verify_password(userCreate.password, hash_password)
     # print(validate_password)
 
-
 @app.post(f'{ROOT_PATH}/authenticate')
 async def authenticate(userLogon: UserLogon):
     
   user = user_DAL.validate_user(userLogon)
+  print(user)
   if user:
-    access_token_expires = timedelta(minutes=jwt_config["ACCESS_TOKEN_EXPIRE_MINUTES"])
-    access_token = create_access_token(
-        data={"sub": user.email}, expires_delta=access_token_expires
-    )
+    # access_token_expires = timedelta(minutes=jwt_config["ACCESS_TOKEN_EXPIRE_MINUTES"])
+    # access_token = create_access_token(
+    #     data={"sub": user.email}, expires_delta=access_token_expires
+    # )
 
-    print("access_token")
-    print(access_token)
+    # print("access_token")
+    # print(access_token)
+    # print(user)
 
     return user
   raise HTTPException(status_code=401, detail=f"Logon failed")
@@ -107,13 +108,10 @@ async def authenticate(userLogon: UserLogon):
 ##########################################
 # Weight
 ##########################################
-@app.get(f"{ROOT_PATH}/weightstats/{{user_id}}", response_model=WeightDto, response_model_exclude_unset=False)
+@app.get(f"{ROOT_PATH}/weightstats/{{user_id}}", response_model=List[WeightDto], response_model_exclude_unset=False)
 async def get_weights_by_user(user_id: int):
-
-  print("Get Weights for userID")
-  print(user_id)
-
   weight_stats = weight_DAL.get_weights_by_user(user_id)
+  print(weight_stats)
   if weight_stats == None:
       raise HTTPException(status_code=404, detail="User not found")
   return weight_stats

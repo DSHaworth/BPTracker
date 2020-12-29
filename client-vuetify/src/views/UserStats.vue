@@ -46,6 +46,7 @@ export default {
       statTrackerService.getWeightStatsByUser(1)      
         .then((res) => {
 
+          console.log("Get Weigth Results")
           console.log(res);
 
           // if(res.data){
@@ -54,7 +55,8 @@ export default {
           // } 
         })
         .catch((error) => {
-            alert(error.response.data.detail);
+            console.log(error)
+            //console.log(error.response.data.detail);
         })
         .finally(() => {
           this.loading = false;
