@@ -11,7 +11,8 @@ export default new Vuex.Store({
   state: {
     status: '',
     token: localStorageService.getToken() || '',
-    user : {}
+    user : {},
+    weightStats: []
   },
   mutations: {
     auth_request(state){
@@ -28,14 +29,20 @@ export default new Vuex.Store({
     logout(state){
       state.status = ''
       state.token = ''
-    }    
+    },
+    /////
+    set_weight_stats(state, weightStats){
+      state.weightStats = weightStats
+    },
+    add_weight_stat(state, weightStat){
+      state.weightStats.push(weightStat)
+    }
   },
   actions: {
     login({commit}, creds){
       return new Promise((resolve, reject) => {
           commit('auth_request')
           statTrackerService.authenticate(creds)
-            //axios({url: 'http://localhost:3000/login', data: user, method: 'POST' })
             .then(result => {
 
                 console.log("login success");
@@ -43,11 +50,13 @@ export default new Vuex.Store({
 
                 const token = result.data.token;
                 const user = result.data.user;
+                const weightStats = result.data.weightStats;
                 localStorageService.setToken(token);
                 //localStorage.setItem('token', token);
                 // Add the following line:
                 axios.defaults.headers.common['Authorization'] = token;
                 commit('auth_success', token, user);
+                commit('set_weight_stats', weightStats)
                 resolve(result);
             })
             .catch(err => {
@@ -64,12 +73,24 @@ export default new Vuex.Store({
           delete axios.defaults.headers.common['Authorization']
           resolve()
       })
-    }    
+    },
+    addWeightStat({commit}, weightStat){
+      commit('add_weight_stat', weightStat);
+    }
   },
   modules: {
   },
   getters : {
     isLoggedIn: state => !!state.token,
     authStatus: state => state.status,
+    userWeightStats: (state) => {
+      console.log("weight stats");
+      console.log(state.weightStats);
+
+      if(state.weightStats){
+        return state.weightStats;
+      }
+      return [];
+    }
   }  
 })

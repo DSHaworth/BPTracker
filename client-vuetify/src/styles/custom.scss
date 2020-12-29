@@ -3,3 +3,9 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
 @import '~@fortawesome/fontawesome-free/scss/fontawesome.scss';
 @import '~@fortawesome/fontawesome-free/scss/regular.scss';
 @import '~@fortawesome/fontawesome-free/scss/solid.scss';
+
+.right-side{
+    display: flex; 
+    flex-flow: row wrap; 
+    justify-content: flex-end;
+}

@@ -25,7 +25,7 @@
         </template>  
 
       </v-card-text>
-      <v-card-actions style="display: flex; flex-flow: row wrap; justify-content: flex-end;">
+      <v-card-actions class="right-side">
         <div>
           <v-btn @click="onShowCreate" elevation="2" raised>
             Create Account

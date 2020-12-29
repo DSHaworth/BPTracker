@@ -93,7 +93,7 @@ async def authenticate(userLogon: UserLogon):
         #     "access_token": access_token, 
         #     "token_type": "bearer"
         # },
-        "weight_stats": weight_stats
+        "weightStats": weight_stats
     }
     #return user
 
