@@ -21,6 +21,7 @@ class UserOutClean(BaseModel):
     email: str
     firstname: str
     lastname: str
+    isActive: Optional[int] = None
     image: Optional[str] = None
     # dob: Optional[str] = None
     # gender: Optional[str] = None

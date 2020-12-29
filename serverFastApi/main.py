@@ -25,22 +25,6 @@ from utils.pwd_helper import Pwd_Helper
 DEBUG = True
 ROOT_PATH = "/stattracker/api/v1"
 
-class TokenData(BaseModel):
-    username: Optional[str] = None
-
-class User(BaseModel):
-    email: str = None
-    disabled: Optional[bool] = None
-
-
-#https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/
-jwt_config = {
-    "SECRET_KEY": "e41f43bcf9af08116d93df5d74f56cfd4b9a39584073a3bf44f216ce729c210a",
-    "ALGORITHM": "HS256",
-    "ACCESS_TOKEN_EXPIRE_MINUTES": 30
-}
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
 app = FastAPI()
 
 #https://fastapi.tiangolo.com/tutorial/cors/
@@ -93,23 +77,88 @@ async def authenticate(userLogon: UserLogon):
   user = user_DAL.validate_user(userLogon)
   print(user)
   if user:
-    # access_token_expires = timedelta(minutes=jwt_config["ACCESS_TOKEN_EXPIRE_MINUTES"])
-    # access_token = create_access_token(
-    #     data={"sub": user.email}, expires_delta=access_token_expires
-    # )
+    access_token_expires = timedelta(minutes=jwt_config["ACCESS_TOKEN_EXPIRE_MINUTES"])
+    access_token = create_access_token(
+        data={"sub": user.email}, expires_delta=access_token_expires
+    )
 
     # print("access_token")
     # print(access_token)
     # print(user)
+    return {"access_token": access_token, "token_type": "bearer"}
+    #return user
 
-    return user
   raise HTTPException(status_code=401, detail=f"Logon failed")
+
+##############################################
+# AUTHENTICATION/TOKENS
+##############################################
+class TokenData(BaseModel):
+    email: Optional[str] = None
+
+class User(BaseModel):
+    email: str = None
+    isActive: Optional[int] = None
+
+
+#https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/
+jwt_config = {
+    "SECRET_KEY": "e41f43bcf9af08116d93df5d74f56cfd4b9a39584073a3bf44f216ce729c210a",
+    "ALGORITHM": "HS256",
+    "ACCESS_TOKEN_EXPIRE_MINUTES": 30
+}
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+def get_user_by_email(email):
+    user = user_DAL.get_user_by_email(email)
+    if user == None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user  
+
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+
+  to_encode = data.copy()
+
+  if expires_delta:
+      expire = datetime.utcnow() + expires_delta
+  else:
+      expire = datetime.utcnow() + timedelta(minutes=15)
+  to_encode.update({"exp": expire})
+  encoded_jwt = jwt.encode(to_encode, jwt_config["SECRET_KEY"], algorithm = jwt_config["ALGORITHM"])
+  return encoded_jwt
+
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, jwt_config["SECRET_KEY"], algorithms=[jwt_config["ALGORITHM"]])
+        email: str = payload.get("sub")
+        if email is None:
+            raise credentials_exception
+        token_data = TokenData(email=email)
+    except JWTError:
+        raise credentials_exception
+    user = get_user_by_email(token_data.email)
+
+    if user is None:
+        raise credentials_exception
+    return user
+
+
+async def get_current_active_user(current_user: User = Depends(get_current_user)):
+    if current_user.isActive == False:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user  
 
 ##########################################
 # Weight
 ##########################################
 @app.get(f"{ROOT_PATH}/weightstats/{{user_id}}", response_model=List[WeightDto], response_model_exclude_unset=False)
-async def get_weights_by_user(user_id: int):
+async def get_weights_by_user(user_id: int, current_user: User = Depends(get_current_active_user)):
   weight_stats = weight_DAL.get_weights_by_user(user_id)
   print(weight_stats)
   if weight_stats == None:
@@ -152,46 +201,3 @@ async def create_weight_stat(weight_dto: WeightDto):
 
 ##############################################
 
-def get_user_by_email(email):
-    user = user_DAL.get_user_by_email(email)
-    if user == None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user  
-
-
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-
-  to_encode = data.copy()
-
-  if expires_delta:
-      expire = datetime.utcnow() + expires_delta
-  else:
-      expire = datetime.utcnow() + timedelta(minutes=15)
-  to_encode.update({"exp": expire})
-  encoded_jwt = jwt.encode(to_encode, jwt_config["SECRET_KEY"], algorithm = jwt_config["ALGORITHM"])
-  return encoded_jwt
-
-async def get_current_user(token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, jwt_config["SECRET_KEY"], algorithms=[jwt_config["ALGORITHM"]])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-        token_data = TokenData(username=username)
-    except JWTError:
-        raise credentials_exception
-    user = get_user_by_email(token_data.email)
-    if user is None:
-        raise credentials_exception
-    return user
-
-
-async def get_current_active_user(current_user: User = Depends(get_current_user)):
-    if current_user.disabled:
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user  

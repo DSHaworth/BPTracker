@@ -2,6 +2,7 @@
 // https://www.qcode.in/api-error-handling-in-vue-with-axios/
 
 import axios from 'axios';
+import localStorageService from '@/services/localStorageService'
 
 let baseUrl = "http://localhost:8000/stattracker/api/v1";
 let axiosInstance = null;
@@ -35,7 +36,15 @@ export default new class {
 
     //#region User Weight Stats
     getWeightStatsByUser(userId){
-        return axiosInstance(`/weightstats/${userId}`);
+
+        let creds = localStorageService.getCredentialsModel();
+        console.log("creds");
+        console.log(creds);
+        const config = {
+            headers: { Authorization: `Bearer ${creds.access_token}` }
+        };
+
+        return axiosInstance(`/weightstats/${userId}`, config);
     }
     ////#endregion
  }

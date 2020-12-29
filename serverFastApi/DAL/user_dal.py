@@ -12,9 +12,9 @@ class user_DAL:
         with closing(con.cursor()) as c:
             c.execute("""
                 INSERT INTO users 
-                    (email, password, firstname, lastname, dob, image)
+                    (email, password, firstname, lastname, dob, image, isActive)
                 VALUES
-                    (?, ?, ?, ?, ?, ?)""", (user.email, user.password, user.firstname, user.lastname, user.dob, user.image,))
+                    (?, ?, ?, ?, ?, ?, 1)""", (user.email, user.password, user.firstname, user.lastname, user.dob, user.image,))
             con.commit()
         return user
 
@@ -25,9 +25,11 @@ class user_DAL:
         with closing(con.cursor()) as c:
           c.execute("""
             SELECT 
-                userId, email, firstname, lastname, image, dob
+              userId, email, firstname, lastname, image, dob, isActive
             FROM
-                users""")
+              users
+            WHERE
+              isActive=1""")
           rows = c.fetchall()
 
         users = []
@@ -38,7 +40,8 @@ class user_DAL:
             "firstname": row["firstname"], 
             "lastname": row["lastname"], 
             "image": row["image"],
-            "dob": row["dob"]
+            "dob": row["dob"],
+            "isActive": row["isActive"]
           }
           users.append(UserOutClean.parse_obj(current_row_data))
         
@@ -50,7 +53,7 @@ class user_DAL:
         with closing(con.cursor()) as c:
             c.execute("""
                 SELECT 
-                    userId, email, firstname, lastname, image, dob
+                    userId, email, firstname, lastname, image, dob, isActive
                 FROM
                     users
                 WHERE
@@ -64,7 +67,8 @@ class user_DAL:
                 "firstname": row["firstname"], 
                 "lastname": row["lastname"], 
                 "image": row["image"],
-                "dob": row["dob"]
+                "dob": row["dob"],
+                "isActive": row["isActive"]
             }
             return UserOutClean.parse_obj(current_row_data)
         else:
@@ -76,7 +80,7 @@ class user_DAL:
         with closing(con.cursor()) as c:
             c.execute("""
                 SELECT 
-                    userId, email, firstname, lastname, image, dob
+                    userId, email, firstname, lastname, image, dob, isActive
                 FROM
                     users
                 WHERE
@@ -90,7 +94,8 @@ class user_DAL:
                 "firstname": row["firstname"], 
                 "lastname": row["lastname"], 
                 "image": row["image"],
-                "dob": row["dob"]
+                "dob": row["dob"],
+                "isActive": row["isActive"]
             }
             return UserOutClean.parse_obj(current_row_data)
         else:
@@ -107,6 +112,8 @@ class user_DAL:
                 FROM
                     users
                 WHERE
+                    isActive=1
+                AND
                     userId=?
                 AND
                     email=?""", (userLogon.userId, userLogon.email,))

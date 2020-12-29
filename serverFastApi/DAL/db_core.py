@@ -18,12 +18,13 @@ class DB_core:
     sql_create_table_users = """ 
         CREATE TABLE IF NOT EXISTS users(
             userId INTEGER PRIMARY KEY,
+            isActive INTEGER NOT NULL,
             email TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
             firstname TEXT NOT NULL,
             lastname TEXT NOT NULL,
             dob TEXT NOT NULL,
-            image TEXT 
+            image TEXT            
         );"""
 
     sql_create_table_bpstats = """ 

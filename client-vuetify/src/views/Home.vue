@@ -83,10 +83,11 @@ export default {
     },
     // Create User
     onShowCreate: function(){
-      this.showCreateDialog = true
+      this.showCreateDialog = true;
     },
     onCloseCreate: function(){
-      this.showCreateDialog = false
+      this.showCreateDialog = false;
+      this.getUsers();
     }
   },    
   components: {

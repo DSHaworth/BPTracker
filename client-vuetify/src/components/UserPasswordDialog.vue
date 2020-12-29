@@ -41,6 +41,7 @@
 
 <script>
 import statTrackerService from '@/services/statTrackerService'
+import localStorageService from '@/services/localStorageService'
 
 export default {
   name: 'UserPasswordDialog',
@@ -96,11 +97,15 @@ export default {
 
       statTrackerService.authenticate(creds)
           .then((result) => {
+            if(result.status === 200){
+              localStorageService.setCredentialsModel(result.data);
 
-            this.$router.push(`/UserStats`);
-            //     this.sbMessage = "Set Token, Redirect";
-            //this.$router.push(`/UserStats/${this.user.userId}`);
-            //     //console.log(res.data.payload);
+              this.$router.push(`/UserStats`);
+              //     this.sbMessage = "Set Token, Redirect";
+              //this.$router.push(`/UserStats/${this.user.userId}`);
+              //     //console.log(res.data.payload);
+
+            }
           })
           .catch((error) => {
               this.$refs.form.reset();
