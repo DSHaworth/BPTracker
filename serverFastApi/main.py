@@ -81,12 +81,20 @@ async def authenticate(userLogon: UserLogon):
         data={"sub": user.email}, expires_delta=access_token_expires
     )
 
-    stats = user_DAL.get_stats_by_user(user.userId)
+    weight_stats = weight_DAL.get_weights_by_user(user.userId)
 
     # print("access_token")
     # print(access_token)
     # print(user)
-    return {"access_token": access_token, "token_type": "bearer"}
+    return { 
+        "token": access_token,
+        "user": user,
+        # {
+        #     "access_token": access_token, 
+        #     "token_type": "bearer"
+        # },
+        "weight_stats": weight_stats
+    }
     #return user
 
   raise HTTPException(status_code=401, detail=f"Logon failed")

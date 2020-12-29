@@ -4,14 +4,16 @@
 export default new class {
 
     //#region Credentials
-    tokenTitle = "tokenCredentials";
-    setCredentialsModel(token){
-        window.localStorage.setItem(this.tokenTitle, JSON.stringify(token), 1);
+    tokenTitle = "token";
+    setToken(token){
+        window.localStorage.setItem(this.tokenTitle, token);
+        //window.localStorage.setItem(this.tokenTitle, JSON.stringify(token));
     }
-    getCredentialsModel(){
-        return JSON.parse(window.localStorage.getItem(this.tokenTitle));
+    getToken(){
+        return window.localStorage.getItem(this.tokenTitle);
+        //return JSON.parse(window.localStorage.getItem(this.tokenTitle));
     }
-    removeCredentialsModel(){
+    removeToken(){
         return window.localStorage.removeItem(this.tokenTitle);
   }
     ////#endregion

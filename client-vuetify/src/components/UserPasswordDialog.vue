@@ -87,37 +87,28 @@ export default {
         }, 1500)
         return;
       }
-
-      this.loading = true
+      
       let creds = {
         userId:this.user.userId, 
         email:this.user.email, 
         password:this.form.password
       };
 
-      statTrackerService.authenticate(creds)
-          .then((result) => {
-            if(result.status === 200){
-              
-              localStorageService.setCredentialsModel(result.data);
-
-              this.$router.push(`/UserStats`);
-              //     this.sbMessage = "Set Token, Redirect";
-              //this.$router.push(`/UserStats/${this.user.userId}`);
-              //     //console.log(res.data.payload);
-
-            }
-          })
-          .catch((error) => {
-              this.$refs.form.reset();
-              this.snackbar.text = error.response.data.detail;
-              this.snackbar.color = "red"
-              this.snackbar.show = true;
-          })
-          .finally(() => {
-              this.loading = false;
-              // this.displaySnackBar = Boolean(this.sbMessage);
-          });
+      this.loading = true
+      this.$store.dispatch('login', creds)
+        .then(() => {
+          this.closeDialog();
+          this.$router.push('/UserStats');
+        })
+        .catch(err => {
+          this.$refs.form.reset();
+          this.snackbar.text = err.response.data.detail;
+          this.snackbar.color = "red"
+          this.snackbar.show = true;          
+        })
+        .then(() => {
+          this.loading = false;
+        })
     }
   }
 }    
