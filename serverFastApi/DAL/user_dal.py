@@ -1,4 +1,5 @@
 from contextlib import closing
+
 from .db_core import DB_core
 from utils.pwd_helper import Pwd_Helper
 from models.User import UserLogon, UserOutClean
@@ -22,24 +23,24 @@ class user_DAL:
 
         con = DB_core.connect()
         with closing(con.cursor()) as c:
-            c.execute("""
-                SELECT 
-                    userId, email, firstname, lastname, image, dob
-                FROM
-                    users""")
-            rows = c.fetchall()
+          c.execute("""
+            SELECT 
+                userId, email, firstname, lastname, image, dob
+            FROM
+                users""")
+          rows = c.fetchall()
 
         users = []
         for row in rows:            
-            current_row_data = {
-                "userId": row["userId"], 
-                "email": row["email"], 
-                "firstname": row["firstname"], 
-                "lastname": row["lastname"], 
-                "image": row["image"],
-                "dob": row["dob"]
-            }
-            users.append(UserOutClean.parse_obj(current_row_data))
+          current_row_data = {
+            "userId": row["userId"], 
+            "email": row["email"], 
+            "firstname": row["firstname"], 
+            "lastname": row["lastname"], 
+            "image": row["image"],
+            "dob": row["dob"]
+          }
+          users.append(UserOutClean.parse_obj(current_row_data))
         
         return users        
 
@@ -54,6 +55,32 @@ class user_DAL:
                     users
                 WHERE
                     userId=?""", (id,))
+            row = c.fetchone()
+
+        if row:
+            current_row_data = {
+                "userId": row["userId"], 
+                "email": row["email"], 
+                "firstname": row["firstname"], 
+                "lastname": row["lastname"], 
+                "image": row["image"],
+                "dob": row["dob"]
+            }
+            return UserOutClean.parse_obj(current_row_data)
+        else:
+            return None
+
+    @classmethod
+    def get_user_by_email(cls, email):
+        con = DB_core.connect()
+        with closing(con.cursor()) as c:
+            c.execute("""
+                SELECT 
+                    userId, email, firstname, lastname, image, dob
+                FROM
+                    users
+                WHERE
+                    email=?""", (email,))
             row = c.fetchone()
 
         if row:

@@ -15,7 +15,7 @@ export default new class {
         });
     }
 
-    //#region Students
+    //#region User
     getUsers(){
         return axiosInstance("/users");
     }
@@ -31,9 +31,11 @@ export default new class {
     authenticate(creds){
         return axiosInstance.post("/authenticate", creds);
     }
-
-    // saveStudent(item){
-    //     return axiosInstance.post("/users", item);
-    // }
     //#endregion
+
+    //#region User Weight Stats
+    getWeightStatsByUser(userId){
+        return axiosInstance(`/weightstats/${userId}`);
+    }
+    ////#endregion
  }
