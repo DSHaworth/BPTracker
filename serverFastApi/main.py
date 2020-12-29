@@ -75,12 +75,13 @@ async def create_user(user: UserCreateDto):
 async def authenticate(userLogon: UserLogon):
     
   user = user_DAL.validate_user(userLogon)
-  print(user)
   if user:
     access_token_expires = timedelta(minutes=jwt_config["ACCESS_TOKEN_EXPIRE_MINUTES"])
     access_token = create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
+
+    stats = user_DAL.get_stats_by_user(user.userId)
 
     # print("access_token")
     # print(access_token)

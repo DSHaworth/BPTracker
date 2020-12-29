@@ -98,6 +98,7 @@ export default {
       statTrackerService.authenticate(creds)
           .then((result) => {
             if(result.status === 200){
+              
               localStorageService.setCredentialsModel(result.data);
 
               this.$router.push(`/UserStats`);

@@ -7,7 +7,7 @@
         Weight
       </v-tab>
       <v-tab-item value="weight">
-        Weight Component goes here
+        <WeightComponent />
       </v-tab-item>
 
       <v-tab href="#bp">
@@ -31,6 +31,7 @@
 
 <script>
 import statTrackerService from '@/services/statTrackerService'
+import WeightComponent from '@/components/WeightComponent.vue'
 
 export default {
   name: 'UserStats',
@@ -44,15 +45,10 @@ export default {
     getUserWeightStats: function(){
       this.loading = true;
       statTrackerService.getWeightStatsByUser(1)      
-        .then((res) => {
-
-          console.log("Get Weigth Results")
-          console.log(res);
-
-          // if(res.data){
-
-          //   //this.users = res.data;
-          // } 
+        .then((result) => {
+          if(result === 200){
+            this.weightStats = result.data;
+          }
         })
         .catch((error) => {
             console.log(error)
@@ -63,8 +59,11 @@ export default {
         });
     }
   },
+  components: {
+    WeightComponent
+  },  
   created() {
-    this.getUserWeightStats();
+    //this.getUserWeightStats();
   }  
 }    
 </script>

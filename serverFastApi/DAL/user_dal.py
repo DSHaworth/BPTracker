@@ -162,6 +162,46 @@ class user_DAL:
     # def make_user(cls, row):
     #     return User(userId=row["userId"], email=row["email"], firstname=row["firstname"], lastname=row["lastname"], dob=row["dob"], image=row["image"])
 
+    @classmethod
+    def get_stats_by_user(cls, userId):
+        con = DB_core.connect()
+        with closing(con.cursor()) as c:
+            c.execute("""
+                SELECT 
+                    u.userId, u.email
+                FROM
+                    users AS u
+                INNER JOIN
+                    weight AS w 
+                        ON w.userId = u.userId
+                WHERE
+                    u.userId=?""", (userId,))
+            rows = c.fetchall()
+
+        print("")
+        print("")
+        print("")
+        print("")
+        print("All Stats")
+        print(rows)
+        print("")
+        print("")
+        print("")
+        print("")
+
+        return None
+
+        if row:
+            pwd_verified = Pwd_Helper.verify_password(userLogon.password, row["password"])
+            if pwd_verified:
+                return cls.get_user_by_id(row["userId"])
+            else:
+                return None
+        else:
+            return None
+
+
+
     # ##### TESTS START ############
     # @classmethod
     # def add_user_test(cls):
