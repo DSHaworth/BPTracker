@@ -116,16 +116,16 @@ export default {
     showCreateDialog(visible) {
       if (visible) {
         // Here you would put something to happen when dialog opens up
-        console.log("Dialog was opened!")
+        var d = new Date();
+        this.form.recordTime = `${d.getHours()}:${d.getMinutes()}`;
+        this.form.recordDate = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`
       } else {
         console.log("Dialog was closed!")
       }
     }
   },
   computed: {
-      passwordConfirmationRule() {
-        return Boolean((this.form.password && this.form.password) === (this.form.confirmPassword && this.form.confirmPassword)) || 'Password must match';
-      }
+
   },  
   methods: {
     closeDialog: function(){
@@ -147,7 +147,7 @@ export default {
       }
 
       // Instead of this timeout, here you can call your API
-      if(false){
+      if(true){
         this.loading = true;
         window.setTimeout(() => {
           this.loading = false;
@@ -155,7 +155,7 @@ export default {
         }, 1500)
         return;
       }
-
+      
       this.loading = true
 
       statTrackerService.createUser(dto)
