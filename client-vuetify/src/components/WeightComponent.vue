@@ -111,22 +111,23 @@ export default {
     }
   },
   computed: {
+    ...mapState({currentUser: "user"}),
+    ...mapGetters(['userWeightStats', 'isLoggedIn']),
     getChartValues: function(){
-      let sortByDate = this.$store.getters.userWeightStats
+      let sortByDate = this.userWeightStats
                         .slice() // Make copy of original array (avoids changing original array when sorting)
                         .sort((a, b) => Date.parse(b.recordDateTime) - Date.parse(a.recordDateTime))
                         .map(a => parseFloat(a.weight));  // Return only weight field
       return sortByDate.reverse();
-    },
-    ...mapState({currentUser: "user"}),
-    ...mapGetters(['userWeightStats'])
+    }
   },
   methods: {
     onShowCreate: function(){
       
       this.showCreateDialog = true;
 
-      console.log("IsLoggedOn?: " + this.$store.getters.isLoggedIn);
+      //console.log("IsLoggedOn?: " + this.$store.getters.isLoggedIn);
+      console.log("IsLoggedOn?: " + this.isLoggedIn);
 
       //this.$store.dispatch("addWeightStat", {"weightId": 1, "recordDateTime": new Date(), "weight": 188.3, "notes": ""});
 
@@ -157,7 +158,7 @@ export default {
     //https://codepen.io/mmia/pen/jOPyXad?editors=1010
     customSort: function(items, index, isDesc) {
 
-      this.$store.getters.userWeightStats.sort((a, b) => {
+      this.userWeightStats.sort((a, b) => {
           if (index[0]=='recordDateTime') {
             if (!isDesc[0]) {
                 return new Date(b[index]) - new Date(a[index]);
