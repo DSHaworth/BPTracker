@@ -3,7 +3,7 @@
 
 export default new class {
 
-    //#region Credentials
+    //#region Token
     tokenTitle = "token";
     setToken(token){
         window.localStorage.setItem(this.tokenTitle, token);
@@ -15,6 +15,20 @@ export default new class {
     }
     removeToken(){
         return window.localStorage.removeItem(this.tokenTitle);
-  }
+    }
     ////#endregion
+
+    //#region User
+    userTitle = "user";
+    setUser(user){
+        window.localStorage.setItem(this.userTitle, JSON.stringify(user));
+    }
+    getUser(){
+        return JSON.parse(window.localStorage.getItem(this.userTitle));
+    }
+    removeUser(){
+        return window.localStorage.removeItem(this.userTitle);
+  }
+    ////#endregion    
+
  }

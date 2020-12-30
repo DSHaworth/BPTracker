@@ -29,17 +29,11 @@
             
             <v-row>
               <v-col cols="12" md="6">
-                <v-text-field label="First name*" type="text" v-model="form.firstname" :rules="rules.requiredAlpha" required></v-text-field>                
+                <v-text-field label="Weight*" type="number" v-model="form.weight" :rules="rules.requiredNumber" required></v-text-field>                
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field label="Last name*" type="text" v-model="form.lastname" :rules="rules.requiredAlpha" required></v-text-field>                
+                <v-text-field label="Notes" type="text" v-model="form.notes" ></v-text-field>                
               </v-col>              
-            </v-row>
-
-            <v-row>
-              <v-col cols="12" md="6">
-                <v-select v-model="form.gender" :items="['Male', 'Female']" label="Gender*"></v-select>
-              </v-col>
             </v-row>
 
           </v-form>
@@ -51,7 +45,7 @@
         <v-btn color="blue darken-1" text @click="closeDialog()">
           Close
         </v-btn>
-        <v-btn color="blue darken-1" :loading="loading" :disabled="loading || !valid" text @click="createUser()">
+        <v-btn color="blue darken-1" :loading="loading" :disabled="loading || !valid" text @click="createWeightStat()">
           Save
         </v-btn>
       </v-card-actions>
@@ -75,7 +69,8 @@ import statTrackerService from '@/services/statTrackerService'
 export default {
   name: 'WeightCreateDialog',
   props: {
-    showCreateDialog: Boolean,    
+    showCreateDialog: Boolean,
+    userId: Number
   },
   data(){
     return {
@@ -87,17 +82,9 @@ export default {
         notes: ''
       },
       rules: {
-        email: [
-          v => !!v || 'E-mail is required',
-          v => (v && /.+@.+\..+/.test(v)) || 'E-mail must be valid',
-        ],      
-        password: [
-          v => !!v || 'Password is required',
-          v => (v && v.length >= 4) || 'Password must be at least 4 characters',
-        ],
-        requiredAlpha: [
+        requiredNumber: [
           v => !!v || 'Input is required',
-          v => (v && /^[A-Za-z]+$/.test(v)) || 'Input must be valid',
+          v => (v && /^[0-9]+([.][0-9]+)?$/g.test(v)) || 'Input must be valid',
         ]
       },
       snackbar: {
@@ -120,69 +107,55 @@ export default {
         this.form.recordTime = `${d.getHours()}:${d.getMinutes()}`;
         this.form.recordDate = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`
       } else {
-        console.log("Dialog was closed!")
+        //console.log("Dialog was closed!")
       }
     }
   },
   computed: {
-
   },  
   methods: {
     closeDialog: function(){
       this.$refs.form.reset();
       this.$emit('close-create')
     },
-    saveDob (date) {
-      this.$refs.menuDate.save(date)
-    },    
-    createUser () {
+    // saveDob (date) {
+    //   this.$refs.menuDate.save(date)
+    // },    
+    createWeightStat () {
       let dto = {
-        email: this.form.email,
-        firstname: this.form.firstname,
-        lastname: this.form.lastname,
-        gender: this.form.gender, 
-        dob: this.form.dob,
-        password: this.form.password,
-        confirmPassword: this.form.confirmPassword
+        userId:  this.userId,
+        recordDateTime: new Date( `${this.form.recordDate} ${this.form.recordTime}`),
+        weight: parseFloat(this.form.weight),
+        notes: this.form.notes,
       }
 
       // Instead of this timeout, here you can call your API
-      if(true){
+      if(false){
         this.loading = true;
         window.setTimeout(() => {
+          this.$store.dispatch("addWeightStat", dto);
           this.loading = false;
-          this.closeDialog();
         }, 1500)
         return;
       }
       
       this.loading = true
 
-      statTrackerService.createUser(dto)
-        .then((result) => {
-          if(result){
-              this.sbMessage = "Set Token, Redirect";
-
-              this.snackbar.text = "User created";
-              this.snackbar.color_scheme = "success"
-              this.snackbar.show = true;
-
-              //this.$router.push(`/UserStats/${this.user.userId}`);
-              //console.log(res.data.payload);
-          }
-        })
-        .catch((error) => {
-          this.snackbar.text = error.response.data.detail;
-          this.snackbar.color = "red"
+      this.$store.dispatch('addWeightStat', dto)
+        .then(() => {
+          this.snackbar.text = "New weight added";
+          this.snackbar.color = "green"
           this.snackbar.show = true;
         })
-        .finally(() => {
-            this.loading = false;
-            // this.displaySnackBar = Boolean(this.sbMessage);
-        });
-    },
-    activated(){
-      alert("activated");
+        .catch(err => {
+          this.$refs.form.reset();
+          this.snackbar.text = err.response.data.detail;
+          this.snackbar.color = "red"
+          this.snackbar.show = true;          
+        })
+        .then(() => {
+          this.loading = false;
+        })
     }
   }
 }    

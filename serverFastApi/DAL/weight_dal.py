@@ -10,10 +10,10 @@ class weight_DAL:
     con = DB_core.connect()
     with closing(con.cursor()) as c:
       c.execute("""
-        INSERT INTO users 
+        INSERT INTO weight 
             (userId, weight, notes, recordDateTime )
         VALUES
-            (?, ?, ?, ?, ?, ?)""", (weight.userId, weight.weight, weight.notes, weight.recordDateTime,))
+            (?, ?, ?, ?)""", (weight.userId, weight.weight, weight.notes, weight.recordDateTime,))
       con.commit()
     return weight   
 
@@ -28,7 +28,8 @@ class weight_DAL:
         FROM
           weight
         WHERE
-          userId=?""", (userId,))
+          userId=?
+        ORDER BY datetime(recordDateTime) DESC""", (userId,))
       rows = c.fetchall()
 
     weights = []

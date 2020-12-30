@@ -3,9 +3,7 @@ from pydantic import BaseModel
 
 class WeightDto(BaseModel):
     weightId: Optional[int] = None
+    recordDateTime: str
     userId: int
     weight: str
-    notes: str
-    recordDateTime: str
-
-    
+    notes: Optional[str] = None

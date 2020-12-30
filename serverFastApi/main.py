@@ -169,14 +169,12 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
 @app.get(f"{ROOT_PATH}/weightstats/{{user_id}}", response_model=List[WeightDto], response_model_exclude_unset=False)
 async def get_weights_by_user(user_id: int, current_user: User = Depends(get_current_active_user)):
   weight_stats = weight_DAL.get_weights_by_user(user_id)
-  print(weight_stats)
   if weight_stats == None:
       raise HTTPException(status_code=404, detail="User not found")
   return weight_stats
 
 @app.post(f'{ROOT_PATH}/weightstats', status_code=201) #201 = created
 async def create_weight_stat(weight_dto: WeightDto):
-    
   try:
     weight_DAL.add_weight(weight_dto)
     return None

@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import axios from 'axios'
 
 import statTrackerService from '@/services/statTrackerService'
 import localStorageService from '@/services/localStorageService'
@@ -11,24 +10,25 @@ export default new Vuex.Store({
   state: {
     status: '',
     token: localStorageService.getToken() || '',
-    user : {},
+    user : localStorageService.getUser() || {},
     weightStats: []
   },
   mutations: {
     auth_request(state){
-      state.status = 'loading'
+      state.status = 'loading';
     },
     auth_success(state, token, user){
-      state.status = 'success'
-      state.token = token
-      state.user = user
+      state.status = 'success';
+      state.token = token;
+      state.user = user;
     },
     auth_error(state){
-      state.status = 'error'
+      state.status = 'error';
     },
     logout(state){
-      state.status = ''
-      state.token = ''
+      state.status = '';
+      state.token = '';
+      state.user = null;
     },
     /////
     set_weight_stats(state, weightStats){
@@ -44,38 +44,59 @@ export default new Vuex.Store({
           commit('auth_request')
           statTrackerService.authenticate(creds)
             .then(result => {
-
-                console.log("login success");
-                console.log(result);
-
                 const token = result.data.token;
                 const user = result.data.user;
-                const weightStats = result.data.weightStats;
+                //const weightStats = result.data.weightStats;
                 localStorageService.setToken(token);
+                localStorageService.setUser(user);
                 //localStorage.setItem('token', token);
                 // Add the following line:
-                axios.defaults.headers.common['Authorization'] = token;
-                commit('auth_success', token, user);
-                commit('set_weight_stats', weightStats)
+                //axios.defaults.headers.common['Authorization'] = token;
+                //axios.defaults.headers.common['Authorization'] = token;
+                commit('auth_success', token, user);                
                 resolve(result);
             })
             .catch(err => {
-                commit('auth_error')
+                commit('auth_error');
                 localStorageService.removeToken();
+                localStorageService.removeUser();
                 reject(err);
             })
       })
     },
     logout({commit}){
       return new Promise((resolve, reject) => {
-          commit('logout')
-          localStorage.removeItem('token')
-          delete axios.defaults.headers.common['Authorization']
-          resolve()
+          commit('logout');
+          localStorageService.removeToken();
+          localStorageService.removeUser();
+          resolve();
+      })
+    },
+    // Weights
+    getWeightStat({commit}, userId){
+      return new Promise((resolve, reject) => {
+        statTrackerService.getWeightStatsByUser(userId)
+          .then(result => {
+            const weightStats = result.data;
+            commit('set_weight_stats', weightStats);
+            resolve(result);
+          })
+          .catch(err => {
+            reject(err);
+          })
       })
     },
     addWeightStat({commit}, weightStat){
-      commit('add_weight_stat', weightStat);
+      return new Promise((resolve, reject) => {
+        statTrackerService.addWeightStatForUser(weightStat)
+          .then(result => {
+              commit('add_weight_stat', weightStat);
+              resolve(result);
+          })
+          .catch(err => {
+              reject(err);
+          })
+      })
     }
   },
   modules: {
@@ -84,13 +105,7 @@ export default new Vuex.Store({
     isLoggedIn: state => !!state.token,
     authStatus: state => state.status,
     userWeightStats: (state) => {
-      console.log("weight stats");
-      console.log(state.weightStats);
-
-      if(state.weightStats){
-        return state.weightStats;
-      }
-      return [];
+      return state.weightStats ? state.weightStats : []
     }
   }  
 })
