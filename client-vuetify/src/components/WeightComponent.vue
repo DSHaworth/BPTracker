@@ -55,16 +55,6 @@
       ></v-sparkline>
 
     </v-tab-item>
-
-    <v-snackbar v-model="snackbar.show" :timeout="snackbar.timeout" :color="snackbar.color" top>
-      {{ snackbar.text }}
-      <template v-slot:action="{ attrs }">
-        <v-btn color="yellow" text v-bind="attrs" @click="snackbar.show = false" >
-          Close
-        </v-btn>
-      </template>
-    </v-snackbar>
-
   </v-tabs>
 
 </template>
@@ -72,6 +62,7 @@
 <script>
 import { mapState, mapGetters  } from 'vuex'
 import WeightCreateDialog from '@/components/WeightCreateDialog.vue'
+import snackbarService from '@/services/snackbarService'
 import EventBus from '@/eventBus'
 
 export default {
@@ -79,12 +70,6 @@ export default {
   data () {
     return {
       showCreateDialog: false,
-      snackbar: {
-        show: false,
-        text: "",
-        timeout: 3000,
-        color: ""
-      },  
       headers: [
         { text: 'Date', value: 'recordDateTime' },
         { text: 'Weight', value: 'weight' },
@@ -143,11 +128,10 @@ export default {
             EventBus.$emit('REAUTHENTICATE', this.getUserWeightStats)
           }
           else {
-            this.snackbar.text = error.response.data.detail;
-            this.snackbar.color = "red"
-            this.snackbar.show = true;
+            snackbarService.showError({
+              text: error.response.data.detail,
+            })
           }
-
         })
         .then(() => {
           //this.loading = false;

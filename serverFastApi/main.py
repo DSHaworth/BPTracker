@@ -174,7 +174,7 @@ async def get_weights_by_user(user_id: int, current_user: User = Depends(get_cur
   return weight_stats
 
 @app.post(f'{ROOT_PATH}/weightstats', status_code=201) #201 = created
-async def create_weight_stat(weight_dto: WeightDto):
+async def create_weight_stat(weight_dto: WeightDto, current_user: User = Depends(get_current_active_user)):
   try:
     weight_DAL.add_weight(weight_dto)
     return None

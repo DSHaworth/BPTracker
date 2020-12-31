@@ -36,7 +36,10 @@ export default new class {
 
     getAuthorizationHeader(){
         return {
-            headers: { Authorization: `Bearer ${store.state.token}` }
+            headers: { 
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${store.state.token}` 
+            }
         };
     }
 
@@ -46,15 +49,7 @@ export default new class {
     }
 
     addWeightStatForUser(weightStat){
-
-        // let creds = localStorageService.getCredentialsModel();
-        // console.log("creds");
-        // console.log(creds);
-        // const config = {
-        //     headers: { Authorization: `Bearer ${creds.access_token}` }
-        // };
-        // return axiosInstance.post(`/weightstats/${userId}`, weightStat, config);
-        return axiosInstance.post(`/weightstats`, weightStat);
+        return axiosInstance.post(`/weightstats`, weightStat, this.getAuthorizationHeader());
     }    
     ////#endregion
  }

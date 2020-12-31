@@ -6,6 +6,14 @@
         <router-link to="/about">About</router-link>
       </div>
       <user-password-dialog :showLogonDialog="showLogonDialog" v-on:close-logon="onCloseLogon" :successAction="successAction"/>
+      <v-snackbar v-model="snackbar.show" :timeout="snackbar.timeout" :color="snackbar.color" top>
+        {{ snackbar.text }}
+        <template v-slot:action="{ attrs }">
+          <v-btn color="yellow" text v-bind="attrs" @click="snackbar.show = false" >
+            Close
+          </v-btn>
+        </template>
+      </v-snackbar>
       <div class="router-view">
         <router-view/>
       </div>
@@ -25,6 +33,12 @@ export default {
   data: () => ({
     showLogonDialog: false,
     successAction: null,
+    snackbar: {
+      show: false,
+      // text: "",
+      // timeout: 3000,
+      // color: ""
+    },      
   }),
   methods: {
     onCloseLogon: function(){
@@ -35,6 +49,9 @@ export default {
     EventBus.$on('REAUTHENTICATE', (payload) => {
       this.successAction = payload;
       this.showLogonDialog = true;
+    }),
+    EventBus.$on('SNACKBAR', (payload) => {
+      this.snackbar = payload;
     })
   }  
 };

@@ -50,21 +50,12 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-
-    <v-snackbar v-model="snackbar.show" :timeout="snackbar.timeout" :color="snackbar.color" top>
-      {{ snackbar.text }}
-      <template v-slot:action="{ attrs }">
-        <v-btn color="yellow" text v-bind="attrs" @click="snackbar.show = false" >
-          Close
-        </v-btn>
-      </template>
-    </v-snackbar>
-
   </v-dialog>
 </template>
 
 <script>
 import statTrackerService from '@/services/statTrackerService'
+import snackbarService from '@/services/snackbarService'
 
 export default {
   name: 'WeightCreateDialog',
@@ -87,12 +78,6 @@ export default {
           v => (v && /^[0-9]+([.][0-9]+)?$/g.test(v)) || 'Input must be valid',
         ]
       },
-      snackbar: {
-        show: false,
-        text: "",
-        timeout: 3000,
-        color: ""
-      },  
       menuRecordDate: false,
       menuRecordTime: false,
       valid: false,
@@ -118,9 +103,6 @@ export default {
       this.$refs.form.reset();
       this.$emit('close-create')
     },
-    // saveDob (date) {
-    //   this.$refs.menuDate.save(date)
-    // },    
     createWeightStat () {
       let dto = {
         userId:  this.userId,
@@ -143,15 +125,15 @@ export default {
 
       this.$store.dispatch('addWeightStat', dto)
         .then(() => {
-          this.snackbar.text = "New weight added";
-          this.snackbar.color = "green"
-          this.snackbar.show = true;
+          snackbarService.showSuccess({
+            text: "New weight added"
+          })
         })
         .catch(err => {
           this.$refs.form.reset();
-          this.snackbar.text = err.response.data.detail;
-          this.snackbar.color = "red"
-          this.snackbar.show = true;          
+          snackbarService.showError({
+            text: err.response.data.detail
+          })
         })
         .then(() => {
           this.loading = false;

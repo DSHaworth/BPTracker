@@ -61,21 +61,12 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-
-    <v-snackbar v-model="snackbar.show" :timeout="snackbar.timeout" :color="snackbar.color" top>
-      {{ snackbar.text }}
-      <template v-slot:action="{ attrs }">
-        <v-btn color="yellow" text v-bind="attrs" @click="snackbar.show = false" >
-          Close
-        </v-btn>
-      </template>
-    </v-snackbar>
-
   </v-dialog>
 </template>
 
 <script>
 import statTrackerService from '@/services/statTrackerService'
+import snackbarService from '@/services/snackbarService'
 
 export default {
   name: 'UserCreateDialog',
@@ -106,12 +97,6 @@ export default {
           v => (v && /^[A-Za-z]+$/.test(v)) || 'Input must be valid',
         ]
       },
-      snackbar: {
-        show: false,
-        text: "",
-        timeout: 3000,
-        color: ""
-      },  
       menu: false,
       valid: false,
       loading: false
@@ -161,24 +146,18 @@ export default {
       statTrackerService.createUser(dto)
         .then((result) => {
           if(result){
-              this.sbMessage = "Set Token, Redirect";
-
-              this.snackbar.text = "User created";
-              this.snackbar.color_scheme = "success"
-              this.snackbar.show = true;
-
-              //this.$router.push(`/UserStats/${this.user.userId}`);
-              //console.log(res.data.payload);
+            snackbarService.showSuccess({
+              text: "User Created"
+            });
           }
         })
         .catch((error) => {
-          this.snackbar.text = error.response.data.detail;
-          this.snackbar.color = "red"
-          this.snackbar.show = true;
+          snackbarService.showError({
+            text: error.response.data.detail
+          });
         })
         .finally(() => {
-            this.loading = false;
-            // this.displaySnackBar = Boolean(this.sbMessage);
+            this.loading = false;            
         });
     }
   }
