@@ -22,7 +22,7 @@
           </v-btn>
 
         </div>
-        <v-data-table :headers="headers" :items="userWeightStats" :items-per-page="5" :custom-sort="customSort" class="elevation-1">
+        <v-data-table :headers="headers" :items="userWeightStats" :items-per-page="5" :custom-sort="customSort" class="elevation-1" :loading="loading" loading-text="Loading... Please wait">
           <template v-slot:item.recordDateTime="{ item }">
             <span>{{ new Date(item.recordDateTime).toLocaleString() }}</span>
           </template>          
@@ -70,6 +70,7 @@ export default {
   data () {
     return {
       showCreateDialog: false,
+      loading: false,
       headers: [
         { text: 'Date', value: 'recordDateTime' },
         { text: 'Weight', value: 'weight' },
@@ -118,10 +119,10 @@ export default {
       this.showCreateDialog = false;
     },
     getUserWeightStats: function(){
+
+      this.loading = true;
       this.$store.dispatch('getWeightStat', this.currentUser.userId)
-        .then(() => {
-          // this.closeDialog();
-          // this.$router.push('/UserStats');
+        .then(() => {          
         })
         .catch(error => {
           if(error.response.status === 401){
@@ -134,7 +135,7 @@ export default {
           }
         })
         .then(() => {
-          //this.loading = false;
+          this.loading = false;
         })      
     },
     //https://codepen.io/mmia/pen/jOPyXad?editors=1010
