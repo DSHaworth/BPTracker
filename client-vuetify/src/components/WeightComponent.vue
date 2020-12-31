@@ -70,8 +70,9 @@
 </template>
 
 <script>
-import WeightCreateDialog from '@/components/WeightCreateDialog.vue'
 import { mapState, mapGetters  } from 'vuex'
+import WeightCreateDialog from '@/components/WeightCreateDialog.vue'
+import EventBus from '@/eventBus'
 
 export default {
   name: 'WeightComponent',
@@ -126,12 +127,7 @@ export default {
       
       this.showCreateDialog = true;
 
-      //console.log("IsLoggedOn?: " + this.$store.getters.isLoggedIn);
       console.log("IsLoggedOn?: " + this.isLoggedIn);
-
-      //this.$store.dispatch("addWeightStat", {"weightId": 1, "recordDateTime": new Date(), "weight": 188.3, "notes": ""});
-
-      //this.showCreateDialog = true;
     },
     onCloseCreate: function(){
       this.showCreateDialog = false;
@@ -142,14 +138,16 @@ export default {
           // this.closeDialog();
           // this.$router.push('/UserStats');
         })
-        .catch(err => {
-          //this.snackbar.text = err.response.data.detail;
-          console.log("err");
-          console.log(err);
+        .catch(error => {
+          if(error.response.status === 401){
+            EventBus.$emit('REAUTHENTICATE', this.getUserWeightStats)
+          }
+          else {
+            this.snackbar.text = error.response.data.detail;
+            this.snackbar.color = "red"
+            this.snackbar.show = true;
+          }
 
-          this.snackbar.text = err.response.data.detail;
-          this.snackbar.color = "red"
-          this.snackbar.show = true;          
         })
         .then(() => {
           //this.loading = false;

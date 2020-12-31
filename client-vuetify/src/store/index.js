@@ -17,10 +17,9 @@ export default new Vuex.Store({
     auth_request(state){
       state.status = 'loading';
     },
-    auth_success(state, token, user){
+    auth_success(state, token){
       state.status = 'success';
-      state.token = token;
-      state.user = user;
+      state.token = token;      
     },
     auth_error(state){
       state.status = 'error';
@@ -29,6 +28,9 @@ export default new Vuex.Store({
       state.status = '';
       state.token = '';
       state.user = null;
+    },
+    set_user(state, user){
+      state.user = user;
     },
     /////
     set_weight_stats(state, weightStats){
@@ -46,14 +48,14 @@ export default new Vuex.Store({
             .then(result => {
                 const token = result.data.token;
                 const user = result.data.user;
-                //const weightStats = result.data.weightStats;
+
                 localStorageService.setToken(token);
                 localStorageService.setUser(user);
-                //localStorage.setItem('token', token);
-                // Add the following line:
-                //axios.defaults.headers.common['Authorization'] = token;
-                //axios.defaults.headers.common['Authorization'] = token;
-                commit('auth_success', token, user);                
+
+                // Had to separate these two for Login Password dialog to work right.
+                commit('set_user', user);
+                commit('auth_success', token);
+
                 resolve(result);
             })
             .catch(err => {
@@ -70,6 +72,13 @@ export default new Vuex.Store({
           localStorageService.removeToken();
           localStorageService.removeUser();
           resolve();
+      })
+    },
+    setUser({commit}, user){
+      return new Promise((resolve, reject) => {
+        commit('set_user', user);
+        localStorageService.setUser(user);
+        resolve();
       })
     },
     // Weights

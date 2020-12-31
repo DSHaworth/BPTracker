@@ -34,7 +34,6 @@
       </v-card-actions>
     </v-card>
     <!-- <loading-dialog msg="Getting Records" v-bind:loading="loading" /> -->
-    <user-password-dialog :showLogonDialog="showLogonDialog" :user="selectedUser" v-on:close-logon="onCloseLogon"/>
     <user-create-dialog :showCreateDialog="showCreateDialog" v-on:close-create="onCloseCreate"/>
   </div>
 </template>
@@ -42,21 +41,20 @@
 <script>
 // @ is an alias to /src
 import statTrackerService from '@/services/statTrackerService'
-//import LoadingDialog from '@/components/LoadingDialog.vue'
 import UserLogonAvatar from '@/components/UserLogonAvatar.vue'
-import UserPasswordDialog from '@/components/UserPasswordDialog.vue'
 import UserCreateDialog from '@/components/UserCreateDialog.vue'
+import EventBus from '@/eventBus'
 
 export default {
   name: 'Home',
   data() { 
     return {
       loading: false,
-      showLogonDialog: false,
       showCreateDialog: false,
-      selectedUser: null,
       users: []
     }
+  },
+  computed:{    
   },
   methods: {
     getUsers: function(){
@@ -75,11 +73,11 @@ export default {
         });
     },
     onSelectedUser: function(user){
-      this.selectedUser = user;
-      this.showLogonDialog = true;
-    },
-    onCloseLogon: function(){
-      this.showLogonDialog = false;
+
+      this.$store.dispatch('logout');
+      this.$store.dispatch('setUser', user);
+
+      EventBus.$emit('REAUTHENTICATE', '/UserStats')
     },
     // Create User
     onShowCreate: function(){
@@ -92,13 +90,10 @@ export default {
   },    
   components: {
     UserLogonAvatar,
-    UserPasswordDialog,
     UserCreateDialog
   },
   created() {
     this.getUsers();
-    // this.loading = true;
-    // setTimeout(this.getUsers, 3000);
   }  
 }
 </script>

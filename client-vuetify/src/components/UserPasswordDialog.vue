@@ -1,8 +1,8 @@
 <template>
-  <v-dialog v-if="user" v-model="showLogonDialog" persistent max-width="600px">
+  <v-dialog v-if="currentUser" v-model="showLogonDialog" persistent max-width="600px">
     <v-card>
       <v-card-title>
-        <span class="headline">{{user.firstname}} {{user.lastname}}</span>
+        <span class="headline">{{currentUser.firstname}} {{currentUser.lastname}}</span>
       </v-card-title>
       <v-card-text>
         <v-container>
@@ -42,12 +42,13 @@
 <script>
 import statTrackerService from '@/services/statTrackerService'
 import localStorageService from '@/services/localStorageService'
+import { mapState  } from 'vuex'
 
 export default {
   name: 'UserPasswordDialog',
   props: {
-    showLogonDialog: Boolean,    
-    user: null
+    showLogonDialog: Boolean,
+    successAction: null
   },
   data(){
     return {
@@ -70,11 +71,13 @@ export default {
       loading: false
     }
   },
+  computed: {
+    ...mapState({currentUser: "user"})
+  },
   methods: {
     closeDialog: function(){
       this.$refs.form.reset();
       this.$emit('close-logon');
-
     },
     authenticate () {
 
@@ -89,16 +92,34 @@ export default {
       }
       
       let creds = {
-        userId:this.user.userId, 
-        email:this.user.email, 
+        userId:this.currentUser.userId, 
+        email:this.currentUser.email, 
         password:this.form.password
       };
-
+      
       this.loading = true
       this.$store.dispatch('login', creds)
-        .then(() => {
-          this.closeDialog();
-          this.$router.push('/UserStats');
+        .then((result) => {
+
+          switch(true){
+            case typeof(this.successAction) === "string":
+              this.closeDialog();
+              this.$router.push(this.successAction);
+              break;
+
+            case typeof(this.successAction) === "function":
+              this.closeDialog();
+              this.successAction();
+              break;
+
+            default:
+              this.$refs.form.reset();
+              this.snackbar.text = `Unknown action type: ${typeof(this.successAction)}`;
+              this.snackbar.color = "red"
+              this.snackbar.show = true;    
+              break;
+          }
+
         })
         .catch(err => {
           this.$refs.form.reset();
