@@ -1,13 +1,14 @@
 <template>
-  <v-dialog v-model="showCreateDialog" persistent max-width="600px">
+  <v-dialog v-model="showDialog" max-width="500px" persistent>
     <v-card>
       <v-card-title>
-        <span class="headline">Add Weight Stat</span>
+        <span class="headline">{{ formTitle }}</span>
       </v-card-title>
+
       <v-card-text>
         <v-container>
-          <v-form ref="form" v-model="valid">
 
+          <v-form ref="form" v-model="valid">
             <v-row>
               <v-col col="12" md="6">
                 <v-menu v-model="menuRecordDate" :close-on-content-click="false" :nudge-right="40" transition="scale-transition" offset-y min-width="290px">
@@ -35,22 +36,23 @@
                 <v-text-field label="Notes" type="text" v-model="form.notes" ></v-text-field>                
               </v-col>              
             </v-row>
-
           </v-form>
+
         </v-container>
-        <small>*indicates required field</small>
       </v-card-text>
+
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="closeDialog()">
+        <v-btn color="blue darken-1" text @click="closeDialog">
           Close
         </v-btn>
-        <v-btn color="blue darken-1" :loading="loading" :disabled="loading || !valid" text @click="createWeightStat()">
+        <v-btn color="blue darken-1" text :loading="loading" :disabled="loading || !valid" @click="createWeightStat">
           Save
         </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
+
 </template>
 
 <script>
@@ -58,15 +60,16 @@ import statTrackerService from '@/services/statTrackerService'
 import snackbarService from '@/services/snackbarService'
 
 export default {
-  name: 'WeightCreateDialog',
+  name: 'WeightAddEditDialog',
   props: {
-    showCreateDialog: Boolean,
-    userId: Number
+    formTitle: String,
+    showDialog: Boolean,
+    userId: Number,
+    item: Object
   },
   data(){
     return {
       form: {
-        showCreateDialog: false,
         recordDate: '',
         recordTime: '',
         weight: '',
@@ -85,12 +88,9 @@ export default {
     }
   },
   watch: {
-    showCreateDialog(visible) {
+    showDialog(visible) {
       if (visible) {
-        // Here you would put something to happen when dialog opens up
-        var d = new Date();
-        this.form.recordTime = `${d.getHours()}:${d.getMinutes()}`;
-        this.form.recordDate = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`
+        this.form = Object.assign({}, this.item)
       } else {
         //console.log("Dialog was closed!")
       }
@@ -99,17 +99,66 @@ export default {
   computed: {
   },  
   methods: {
+    // Dialog Action Methods
     closeDialog: function(){
       this.$refs.form.reset();
       this.$emit('close-create')
     },
     createWeightStat () {
+
       let dto = {
-        userId:  this.userId,
+        weightId: this.form.weightId,
+        userId:  this.form.userId,
         recordDateTime: new Date( `${this.form.recordDate} ${this.form.recordTime}`),
         weight: parseFloat(this.form.weight),
         notes: this.form.notes,
       }
+
+      // https://codepen.io/pen/?editors=1010
+
+      this.loading = true
+      if(this.form.weightId){
+        
+        this.$store.dispatch('updateWeightStat', dto)
+          .then(() => {            
+            snackbarService.showSuccess({
+              text: "Record updated"
+            });            
+          })
+          .catch(err => {
+            this.$refs.form.reset();
+
+            console.log(err);
+
+            snackbarService.showError({
+              text: err.response.data.detail
+            })
+          })
+          .then(() => {
+            this.loading = false;
+            this.closeDialog();
+          })
+      } 
+      else {
+        
+        this.$store.dispatch('addWeightStat', dto)
+          .then(() => {
+            snackbarService.showSuccess({
+              text: "New weight added"
+            })
+          })
+          .catch(err => {
+            this.$refs.form.reset();
+            snackbarService.showError({
+              text: err.response.data.detail
+            })
+          })
+          .then(() => {
+            this.loading = false;
+          })
+      }
+
+      return;
 
       // Instead of this timeout, here you can call your API
       if(false){
@@ -120,24 +169,6 @@ export default {
         }, 1500)
         return;
       }
-      
-      this.loading = true
-
-      this.$store.dispatch('addWeightStat', dto)
-        .then(() => {
-          snackbarService.showSuccess({
-            text: "New weight added"
-          })
-        })
-        .catch(err => {
-          this.$refs.form.reset();
-          snackbarService.showError({
-            text: err.response.data.detail
-          })
-        })
-        .then(() => {
-          this.loading = false;
-        })
     }
   }
 }    

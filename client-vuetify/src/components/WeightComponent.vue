@@ -13,23 +13,50 @@
     <v-tab-item value="table">
 
       <v-sheet color="white" elevation="2" style="padding: 10px; margin: 10px;">
-        <div class='right-side' style="margin-bottom: .5rem;">  
 
+        <v-toolbar flat>
+          <v-toolbar-title>{{currentUser.firstname}} {{currentUser.lastname}}</v-toolbar-title> 
+          <v-divider class="mx-4" inset vertical></v-divider>
+          <v-spacer></v-spacer>
           <v-btn color="primary" elevation="2" fab small @click="onShowCreate()">
             <v-icon dark>
               mdi-plus
             </v-icon>
           </v-btn>
+        </v-toolbar>
 
-        </div>
         <v-data-table :headers="headers" :items="userWeightStats" :items-per-page="5" :custom-sort="customSort" class="elevation-1" :loading="loading" loading-text="Loading... Please wait">
+          <template v-slot:item.weights="{ item }">
+            <span>{{ item.weight.toFixed(1) }}</span>
+          </template>
           <template v-slot:item.recordDateTime="{ item }">
             <span>{{ new Date(item.recordDateTime).toLocaleString() }}</span>
-          </template>          
+          </template>
+          <template v-slot:item.actions="{ item }">
+            <v-icon small class="mr-2" @click="editItem(item)" >
+              mdi-pencil
+            </v-icon>
+            <v-icon small @click="deleteItem(item)">
+              mdi-delete
+            </v-icon>
+          </template>               
         </v-data-table>
-        <weight-create-dialog :showCreateDialog="showCreateDialog" v-on:close-create="onCloseCreate" :userId="currentUser.userId"/>
-      </v-sheet>  
 
+        <weight-add-edit-dialog :showDialog="showDialog" :formTitle="formTitle" :item="editedItem" v-on:close-create="onCloseCreate"/>
+
+        <v-dialog v-model="showDeleteDialog" max-width="500px">
+          <v-card>
+            <v-card-title class="headline">Are you sure you want to delete this item?</v-card-title>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
+              <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+              <v-spacer></v-spacer>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>        
+
+      </v-sheet>  
     </v-tab-item>
 
     <v-tab href="#chart">
@@ -51,8 +78,7 @@
         :fill="sparklineConfig.fill"
         :type="sparklineConfig.type"
         :auto-line-width="sparklineConfig.autoLineWidth"        
-        auto-draw
-      ></v-sparkline>
+        auto-draw />
 
     </v-tab-item>
   </v-tabs>
@@ -61,7 +87,7 @@
 
 <script>
 import { mapState, mapGetters  } from 'vuex'
-import WeightCreateDialog from '@/components/WeightCreateDialog.vue'
+import WeightAddEditDialog from '@/components/WeightAddEditDialog.vue'
 import snackbarService from '@/services/snackbarService'
 import EventBus from '@/eventBus'
 
@@ -69,12 +95,30 @@ export default {
   name: 'WeightComponent',
   data () {
     return {
-      showCreateDialog: false,
+      showDialog: false,
+      showDeleteDialog: false,
       loading: false,
+      editedItem: {
+        weightId: 0,
+        userId: 0,
+        recordDate: '',
+        recordTime: '',
+        weight: '',
+        notes: '',
+      },  
+      defaultItem: {
+        weightId: 0,
+        userId: 0,
+        recordDate: '',
+        recordTime: '',
+        weight: null,
+        notes: '',
+      },           
       headers: [
-        { text: 'Date', value: 'recordDateTime' },
-        { text: 'Weight', value: 'weight' },
-        { text: 'Notes', value: 'notes', sortable: false }
+        { text: 'Date', value: 'recordDateTime', sortable: false, width: "13rem" },
+        { text: 'Weight', value: 'weight', sortable: false, width: "6rem" },
+        { text: 'Notes', value: 'notes', sortable: false },
+        { text: 'Actions', value: 'actions', sortable: false, align: 'end' }
       ],
       sparklineConfig: {
         width: 2,
@@ -100,6 +144,9 @@ export default {
   computed: {
     ...mapState({currentUser: "user"}),
     ...mapGetters(['userWeightStats', 'isLoggedIn']),
+    formTitle () {
+      return (this.editedItem.weightId === 0) ? "Add Item" : "Edit Item";
+    },    
     getChartValues: function(){
       let sortByDate = this.userWeightStats
                         .slice() // Make copy of original array (avoids changing original array when sorting)
@@ -109,14 +156,29 @@ export default {
     }
   },
   methods: {
+    // Table Actions
     onShowCreate: function(){
-      
-      this.showCreateDialog = true;
+      this.editedItem = this.defaultItem;
 
-      console.log("IsLoggedOn?: " + this.isLoggedIn);
+      var d = new Date();
+      this.defaultItem.recordTime = `${d.getHours()}:${d.getMinutes()}`;
+      this.defaultItem.recordDate = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`
+      this.editedItem.userId = this.currentUser.userId
+
+      this.showDialog = true;      
+    },
+    editItem (item) {
+      this.editedItem = Object.assign({}, item)
+
+      var d = new Date(item.recordDateTime);
+      this.editedItem.recordTime = `${d.getHours()}:${d.getMinutes()}`;
+      this.editedItem.recordDate = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;      
+      this.editedItem.userId = this.currentUser.userId;
+
+      this.showDialog = true;
     },
     onCloseCreate: function(){
-      this.showCreateDialog = false;
+      this.showDialog = false;
     },
     getUserWeightStats: function(){
 
@@ -137,6 +199,34 @@ export default {
         .then(() => {
           this.loading = false;
         })      
+    },
+    // DELETE START
+    deleteItem (item) {
+      this.editedItem = Object.assign({}, item)
+      this.editedItem.userId = this.currentUser.userId;
+      this.showDeleteDialog = true
+    },
+    closeDelete () {
+      this.showDeleteDialog = false
+    },
+    deleteItemConfirm () {
+
+      this.loading = true;
+      this.$store.dispatch('deleteWeightStat', this.editedItem)
+        .then(() => {     
+          snackbarService.showSuccess({
+            text: "Weight removed"
+          });              
+        })
+        .catch(err => {
+          snackbarService.showError({
+            text: err.response.data.detail
+          });          
+        })
+        .then(() => {
+          this.loading = false;
+          this.closeDelete();
+        })
     },
     //https://codepen.io/mmia/pen/jOPyXad?editors=1010
     customSort: function(items, index, isDesc) {
@@ -161,10 +251,10 @@ export default {
           }
       });
       return items;
-    }    
+    }
   },
   components: {
-    WeightCreateDialog
+    WeightAddEditDialog
   },
   created(){
     this.getUserWeightStats();

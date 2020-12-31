@@ -51,5 +51,13 @@ export default new class {
     addWeightStatForUser(weightStat){
         return axiosInstance.post(`/weightstats`, weightStat, this.getAuthorizationHeader());
     }    
+
+    deleteWeightStatForUser(weightStat){
+        return axiosInstance.delete(`/weightstats/${weightStat.userId}/${weightStat.weightId}`, this.getAuthorizationHeader());
+    } 
+
+    updateWeightStatForUser(weightStat){
+        return axiosInstance.post(`/weightstats/${weightStat.userId}/${weightStat.weightId}`, weightStat, this.getAuthorizationHeader());
+    }        
     ////#endregion
  }

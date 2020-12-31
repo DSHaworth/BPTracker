@@ -18,8 +18,35 @@ class weight_DAL:
     return weight   
 
   @classmethod
-  def get_weights_by_user(cls, userId):
+  def update_weight(cls, weight):
+    con = DB_core.connect()
+    with closing(con.cursor()) as c:
+      c.execute("""
+        UPDATE 
+          weight 
+        SET 
+          weight=?,
+          notes=?,
+          recordDateTime=?
+        WHERE
+          weightId=?""", (weight.weight, weight.notes, weight.recordDateTime, weight.weightId,))
+      con.commit()
+    return weight   
 
+  @classmethod
+  def delete_weight(cls, weightId):
+    con = DB_core.connect()
+    with closing(con.cursor()) as c:
+      c.execute("""
+        DELETE FROM
+          weight
+        WHERE
+          weightId=?""", (weightId,))
+      con.commit()
+    return None
+
+  @classmethod
+  def get_weights_by_user(cls, userId):
     con = DB_core.connect()
     with closing(con.cursor()) as c:
       c.execute("""

@@ -34,10 +34,22 @@ export default new Vuex.Store({
     },
     /////
     set_weight_stats(state, weightStats){
-      state.weightStats = weightStats
+      state.weightStats = weightStats;
     },
     add_weight_stat(state, weightStat){
       state.weightStats.push(weightStat)
+    },
+    update_weight_stat(state, weightStat){
+      const index = state.weightStats.findIndex(item => item.weightId === weightStat.weightId);
+      if (index !== -1){
+        state.weightStats.splice(index, 1, weightStat);
+      } 
+    },
+    delete_weight_stat(state, weightStat){
+      const index = state.weightStats.findIndex(item => item.weightId === weightStat.weightId);
+      if (index !== -1){
+        state.weightStats.splice(index, 1);
+      }       
     }
   },
   actions: {
@@ -59,10 +71,10 @@ export default new Vuex.Store({
                 resolve(result);
             })
             .catch(err => {
-                commit('auth_error');
-                localStorageService.removeToken();
-                localStorageService.removeUser();
-                reject(err);
+              commit('auth_error');
+              localStorageService.removeToken();
+              localStorageService.removeUser();
+              reject(err);
             })
       })
     },
@@ -95,6 +107,7 @@ export default new Vuex.Store({
           })
       })
     },
+    // Weight Stats
     addWeightStat({commit}, weightStat){
       return new Promise((resolve, reject) => {
         statTrackerService.addWeightStatForUser(weightStat)
@@ -105,8 +118,34 @@ export default new Vuex.Store({
           .catch(err => {
               reject(err);
           })
-      })
-    }
+      });
+    },
+    updateWeightStat({commit}, weightStat){
+      //Object.assign(this.desserts[this.editedIndex], this.dto)
+      return new Promise((resolve, reject) => {
+        statTrackerService.updateWeightStatForUser(weightStat)
+          .then(result => {
+              commit('update_weight_stat', weightStat);
+              resolve(result);
+          })
+          .catch(err => {
+              reject(err);
+          })
+      });
+    },
+    deleteWeightStat({commit}, weightStat){
+      //Object.assign(this.desserts[this.editedIndex], this.dto)
+      return new Promise((resolve, reject) => {
+        statTrackerService.deleteWeightStatForUser(weightStat)
+          .then(result => {
+              commit('delete_weight_stat', weightStat);
+              resolve(result);
+          })
+          .catch(err => {
+              reject(err);
+          })
+      });
+    }    
   },
   modules: {
   },
