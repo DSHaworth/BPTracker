@@ -28,12 +28,13 @@ class DB_core:
         );"""
 
     sql_create_table_bpstats = """ 
-        CREATE TABLE IF NOT EXISTS bpstats(
-            bpStatId INTEGER PRIMARY KEY,
+        CREATE TABLE IF NOT EXISTS bp(
+            bpId INTEGER PRIMARY KEY,
             userId INTEGER NOT NULL,
             sys INTEGER NOT NULL,
             dia INTEGER NOT NULL,
             position TEXT NOT NULL,
+            arm TEXT NOT NULL,
             activity TEXT NOT NULL,
             notes TEXT NULL,
             recordDateTime TEXT NOT NULL,

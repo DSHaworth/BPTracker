@@ -21,7 +21,7 @@
         Blood Pressure
       </v-tab>
       <v-tab-item value="bp">
-        Blood Pressure goes here
+        <BloodPressureComponent />
       </v-tab-item>
 
     </v-tabs>
@@ -33,46 +33,26 @@
 import statTrackerService from '@/services/statTrackerService'
 import WeightComponent from '@/components/WeightComponent.vue'
 import PulseComponent from '@/components/PulseComponent.vue'
+import BloodPressureComponent from '@/components/BloodPressureComponent.vue'
 
 export default {
   name: 'UserStats',
   data() { 
     return {
-      loading: false,
-      weightStats: []
     }
   },  
   methods: {
-    getUserWeightStats: function(){
-      this.loading = true;
-      statTrackerService.getWeightStatsByUser(1)      
-        .then((result) => {
-          if(result === 200){
-            this.weightStats = result.data;
-          }
-        })
-        .catch((error) => {
-            console.log(error)
-            //console.log(error.response.data.detail);
-        })
-        .finally(() => {
-          this.loading = false;
-        });
-    }
   },
   components: {
     WeightComponent,
-    PulseComponent
+    PulseComponent,
+    BloodPressureComponent
   },  
   created() {
-    //this.getUserWeightStats();
   }  
 }    
 </script>
 
 <style scoped lang="scss">
-  .card-content{
-      text-align: center;
-      padding: 25px 0;
-  }
+
 </style>

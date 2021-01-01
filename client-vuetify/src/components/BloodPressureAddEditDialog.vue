@@ -30,20 +30,32 @@
             
             <v-row>
               <v-col cols="12" md="6">
-                <v-text-field label="Pulse*" type="number" v-model="form.pulse" :rules="rules.requiredNumber" required
+                <v-text-field label="Sys*" type="number" v-model="form.sys" :rules="rules.requiredNumber" required
                               pattern="[0-9]" onkeypress="return !(event.charCode == 46)" step="1" />                
               </v-col>
               <v-col cols="12" md="6">
-                <v-select v-model="form.activity" :items="activityItems" label="Activity*" required :rules="rules.requiredActivity"></v-select>
+                <v-text-field label="Dia*" type="number" v-model="form.dia" :rules="rules.requiredNumber" required
+                              pattern="[0-9]" onkeypress="return !(event.charCode == 46)" step="1" />
               </v-col>              
             </v-row>
 
             <v-row>
-              <v-col cols="12">
-                <v-text-field label="Notes" type="text" v-model="form.notes" ></v-text-field>                
+              <v-col cols="12" md="6">
+                <v-select v-model="form.arm" :items="armItems" label="Arm*" required :rules="rules.requiredSelect"></v-select>
               </v-col>
+              <v-col cols="12" md="6">
+                <v-select v-model="form.position" :items="positionItems" label="Position*" required :rules="rules.requiredSelect"></v-select>
+              </v-col>              
             </v-row>
 
+            <v-row>
+              <v-col cols="12" md="6">
+                <v-select v-model="form.activity" :items="activityItems" label="Activity*" required :rules="rules.requiredSelect"></v-select>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field label="Notes" type="text" v-model="form.notes" ></v-text-field>
+              </v-col>              
+            </v-row>
           </v-form>
 
         </v-container>
@@ -68,7 +80,7 @@ import statTrackerService from '@/services/statTrackerService'
 import snackbarService from '@/services/snackbarService'
 
 export default {
-  name: 'PulseAddEditDialog',
+  name: 'BloodPressureAddEditDialog',
   props: {
     formTitle: String,
     showDialog: Boolean,
@@ -83,11 +95,13 @@ export default {
           v => !!v || 'Input is required',
           v => (v && /^[0-9]+$/g.test(v)) || 'Input must be valid',
         ],
-        requiredActivity: [
-          v => !!v || 'Activity is required'
+        requiredSelect: [
+          v => !!v || 'Select an item'
         ]
       },
       activityItems: ['General', 'Resting', 'After Exercise', 'Before Exercise'],
+      positionItems: ['Sitting', 'Standing', 'Lying down'],
+      armItems: ['Left', 'Right'],
       menuRecordDate: false,
       menuRecordTime: false,
       valid: false,
@@ -114,19 +128,22 @@ export default {
     addItem () {
 
       let dto = {
-        pulseId: this.form.pulseId,
+        bpId: this.form.bpId,
         userId:  this.form.userId,
         recordDateTime: new Date( `${this.form.recordDate} ${this.form.recordTime}`),
-        pulse: parseInt(this.form.pulse),
+        sys: parseInt(this.form.sys),
+        dia: parseInt(this.form.dia),
+        position: this.form.position,
+        arm: this.form.arm,
         activity: this.form.activity,
         notes: this.form.notes,
       }
 
       // https://codepen.io/pen/?editors=1010
       this.loading = true
-      if(this.form.pulseId){
+      if(this.form.bpId){
         
-        this.$store.dispatch('updatePulseStat', dto)
+        this.$store.dispatch('updateBpStat', dto)
           .then(() => {            
             snackbarService.showSuccess({
               text: "Record updated",
@@ -145,16 +162,15 @@ export default {
           })
       } 
       else {
-        this.$store.dispatch('addPulseStat', dto)
+        this.$store.dispatch('addBpStat', dto)
           .then(() => {
             snackbarService.showSuccess({
-              text: "New pulse added",
+              text: "New BP added",
               timeout: 1500
             });
             this.$refs.form.reset();
           })
           .catch(err => {
-            this.$refs.form.reset();
             snackbarService.showError({
               text: err.response.data.detail
             })

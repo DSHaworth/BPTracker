@@ -12,6 +12,7 @@
       </v-toolbar-items>
 
       <v-menu v-if="$vuetify.breakpoint.smOnly">
+      <!-- <v-menu class="hidden-md-and-up"> -->
         <template v-slot:activator="{ on }">
           <v-btn icon v-on="on">
             <v-icon>mdi-dots-vertical</v-icon>
@@ -33,9 +34,22 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn icon>
-        <v-icon>mdi-magnify</v-icon>
-      </v-btn>
+      <v-menu v-if="isLoggedIn">
+        <template v-slot:activator="{ on }">
+          <v-btn icon v-on="on">
+            <v-icon>mdi-account</v-icon>
+          </v-btn>
+        </template>
+
+        <v-list>
+          <v-list-item to="/profile">
+            <v-list-item-title>Profile</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="logout">
+            <v-list-item-title>Logout</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
 
     </v-app-bar>
     <user-password-dialog :showLogonDialog="showLogonDialog" v-on:close-logon="onCloseLogon" :successAction="successAction"/>
@@ -80,7 +94,11 @@ export default {
   methods: {
     onCloseLogon: function(){
       this.showLogonDialog = false;
-    }    
+    },
+    logout: function(){
+      this.$store.dispatch('logout');
+      this.$router.push('/');
+    }
   },
   computed: {
     ...mapGetters(['isLoggedIn']),    

@@ -56,7 +56,7 @@
         <v-btn color="blue darken-1" text @click="closeDialog()">
           Close
         </v-btn>
-        <v-btn color="blue darken-1" :loading="loading" :disabled="loading || !valid" text @click="createUser()">
+        <v-btn color="blue darken-1" :loading="loading" :disabled="loading || !valid" text @click="addItem">
           Save
         </v-btn>
       </v-card-actions>
@@ -120,7 +120,7 @@ export default {
     saveDob (date) {
       this.$refs.menu.save(date)
     },    
-    createUser () {
+    addItem () {
       let dto = {
         email: this.form.email,
         firstname: this.form.firstname,

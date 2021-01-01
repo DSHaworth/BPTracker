@@ -78,4 +78,22 @@ export default new class {
         return axiosInstance.post(`/pulsestats/${pulseStat.userId}/${pulseStat.pulseId}`, pulseStat, this.getAuthorizationHeader());
     }        
     ////#endregion    
+
+    //#region User Blood Pressure Stats
+    getBpStatsByUser(userId){
+        return axiosInstance(`/bpstats/${userId}`, this.getAuthorizationHeader());
+    }
+
+    addBpStatForUser(bpStat){
+        return axiosInstance.post(`/bpstats`, bpStat, this.getAuthorizationHeader());
+    }    
+
+    deleteBpStatForUser(bpStat){
+        return axiosInstance.delete(`/bpstats/${bpStat.userId}/${bpStat.bpId}`, this.getAuthorizationHeader());
+    } 
+
+    updateBpStatForUser(bpStat){
+        return axiosInstance.post(`/bpstats/${bpStat.userId}/${bpStat.bpId}`, bpStat, this.getAuthorizationHeader());
+    }        
+    ////#endregion        
  }

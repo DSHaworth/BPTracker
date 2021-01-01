@@ -1,30 +1,30 @@
 from contextlib import closing
 
 from .db_core import DB_core
-from models.Pulse import PulseDto
+from models.Bp import BpDto
 
-class pulse_DAL:
+class bp_DAL:
 
   @classmethod
-  def add_pulse(cls, pulse):
+  def add_bp(cls, bp):
     con = DB_core.connect()
     with closing(con.cursor()) as c:
       c.execute("""
-        INSERT INTO pulse 
-            (userId, pulse, activity, notes, recordDateTime )
+        INSERT INTO bp 
+            (userId, sys, dia, position, arm, activity, notes, recordDateTime )
         VALUES
-            (?, ?, ?, ?, ?)""", (pulse.userId, pulse.pulse, pulse.activity, pulse.notes, pulse.recordDateTime,))
+            (?, ?, ?, ?, ?, ?, ?, ?)""", (bp.userId, bp.sys, bp.dia, bp.position, bp.arm, bp.activity, bp.notes, bp.recordDateTime,))
       con.commit()
 
       c.execute("""
         SELECT 
-          pulseId, userId, pulse, activity, notes, recordDateTime
+          bpId, userId, sys, dia, position, arm, activity, notes, recordDateTime
         FROM 
-          pulse 
+          bp 
         WHERE 
           UserId=?
         ORDER BY 
-          pulseId DESC LIMIT 1""", (pulse.userId,))      
+          bpId DESC LIMIT 1""", (bp.userId,))      
       row = c.fetchone()
 
     if row:
@@ -34,62 +34,69 @@ class pulse_DAL:
         return None
 
   @classmethod
-  def update_pulse(cls, pulse):
+  def update_bp(cls, bp):
     con = DB_core.connect()
     with closing(con.cursor()) as c:
       c.execute("""
         UPDATE 
-          pulse 
+          bp 
         SET 
-          pulse=?,
+          sys=?,
+          dia=?,
+          position=?,
           activity=?,
           notes=?,
           recordDateTime=?
         WHERE
-          pulseId=?""", (pulse.pulse, pulse.activity, pulse.notes, pulse.recordDateTime, pulse.pulseId,))
+          bpId=?""", (bp.sys, bp.dia, bp.position, bp.activity, bp.notes, bp.recordDateTime, bp.bpId,))
       con.commit()
-    return pulse   
+    return bp   
 
   @classmethod
-  def delete_pulse(cls, pulseId):
+  def delete_bp(cls, bpId):
     con = DB_core.connect()
     with closing(con.cursor()) as c:
       c.execute("""
         DELETE FROM
-          pulse
+          bp
         WHERE
-          pulseId=?""", (pulseId,))
+          bpId=?""", (bpId,))
       con.commit()
     return None
 
   @classmethod
-  def get_pulse_stats_by_user(cls, userId):
+  def get_bp_by_user(cls, userId):
     con = DB_core.connect()
     with closing(con.cursor()) as c:
       c.execute("""
         SELECT 
-          pulseId, userId, pulse, activity, notes, recordDateTime
-        FROM
-          pulse
-        WHERE
-          userId=?
-        ORDER BY datetime(recordDateTime) DESC""", (userId,))
+          bpId, userId, sys, dia, position, arm, activity, notes, recordDateTime
+        FROM 
+          bp 
+        WHERE 
+          UserId=?
+        ORDER BY 
+          datetime(recordDateTime) DESC""", (userId,))
       rows = c.fetchall()
 
     items = []
     for row in rows:   
       dto = cls.getDtoFromRow(row)
       items.append(dto)
-    return items  
+    return items 
 
   @classmethod
   def getDtoFromRow(cls, row):
     current_row_data = {
-      "pulseId": row["pulseId"], 
+      "bpId": row["bpId"], 
       "userId": row["userId"], 
-      "pulse": row["pulse"], 
+      "sys": row["sys"], 
+      "dia": row["dia"], 
+      "position": row["position"], 
+      "arm": row["arm"],
       "activity": row["activity"],
       "notes": row["notes"], 
       "recordDateTime": row["recordDateTime"]
     }
-    return PulseDto.parse_obj(current_row_data)
+    return BpDto.parse_obj(current_row_data)
+  

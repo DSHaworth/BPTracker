@@ -34,16 +34,8 @@ class user_DAL:
 
         users = []
         for row in rows:            
-          current_row_data = {
-            "userId": row["userId"], 
-            "email": row["email"], 
-            "firstname": row["firstname"], 
-            "lastname": row["lastname"], 
-            "image": row["image"],
-            "dob": row["dob"],
-            "isActive": row["isActive"]
-          }
-          users.append(UserOutClean.parse_obj(current_row_data))
+            dto = cls.getDtoFromRow(row)
+            users.append(dto)
         
         return users        
 
@@ -61,16 +53,8 @@ class user_DAL:
             row = c.fetchone()
 
         if row:
-            current_row_data = {
-                "userId": row["userId"], 
-                "email": row["email"], 
-                "firstname": row["firstname"], 
-                "lastname": row["lastname"], 
-                "image": row["image"],
-                "dob": row["dob"],
-                "isActive": row["isActive"]
-            }
-            return UserOutClean.parse_obj(current_row_data)
+            dto = cls.getDtoFromRow(row)
+            return dto
         else:
             return None
 
@@ -88,16 +72,8 @@ class user_DAL:
             row = c.fetchone()
 
         if row:
-            current_row_data = {
-                "userId": row["userId"], 
-                "email": row["email"], 
-                "firstname": row["firstname"], 
-                "lastname": row["lastname"], 
-                "image": row["image"],
-                "dob": row["dob"],
-                "isActive": row["isActive"]
-            }
-            return UserOutClean.parse_obj(current_row_data)
+            dto = cls.getDtoFromRow(row)
+            return dto
         else:
             return None
 
@@ -127,6 +103,19 @@ class user_DAL:
                 return None
         else:
             return None
+
+    @classmethod
+    def getDtoFromRow(cls, row):
+        current_row_data = {
+            "userId": row["userId"], 
+            "email": row["email"], 
+            "firstname": row["firstname"], 
+            "lastname": row["lastname"], 
+            "image": row["image"],
+            "dob": row["dob"],
+            "isActive": row["isActive"]
+        }
+        return UserOutClean.parse_obj(current_row_data)
 
     # @classmethod
     # def update_user(cls, user):

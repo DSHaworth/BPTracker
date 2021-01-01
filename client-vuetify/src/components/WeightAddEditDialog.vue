@@ -46,7 +46,7 @@
         <v-btn color="blue darken-1" text @click="closeDialog">
           Close
         </v-btn>
-        <v-btn color="blue darken-1" text :loading="loading" :disabled="loading || !valid" @click="createWeightStat">
+        <v-btn color="blue darken-1" text :loading="loading" :disabled="loading || !valid" @click="addItem">
           Save
         </v-btn>
       </v-card-actions>
@@ -69,12 +69,7 @@ export default {
   },
   data(){
     return {
-      form: {
-        recordDate: '',
-        recordTime: '',
-        weight: '',
-        notes: ''
-      },
+      form: {},
       rules: {
         requiredNumber: [
           v => !!v || 'Input is required',
@@ -104,7 +99,7 @@ export default {
       this.$refs.form.reset();
       this.$emit('close-create')
     },
-    createWeightStat () {
+    addItem () {
 
       let dto = {
         weightId: this.form.weightId,

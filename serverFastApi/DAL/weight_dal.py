@@ -28,14 +28,8 @@ class weight_DAL:
       row = c.fetchone()
 
     if row:   
-      current_row_data = {
-        "weightId": row["weightId"], 
-        "userId": row["userId"], 
-        "weight": row["weight"], 
-        "notes": row["notes"], 
-        "recordDateTime": row["recordDateTime"]
-      }
-      return WeightDto.parse_obj(current_row_data)
+      dto = cls.getDtoFromRow(row)
+      return dto
     else:
       return None
 
@@ -81,14 +75,19 @@ class weight_DAL:
         ORDER BY datetime(recordDateTime) DESC""", (userId,))
       rows = c.fetchall()
 
-    weights = []
+    items = []
     for row in rows:   
-      current_row_data = {
-        "weightId": row["weightId"], 
-        "userId": row["userId"], 
-        "weight": row["weight"], 
-        "notes": row["notes"], 
-        "recordDateTime": row["recordDateTime"]
-      }
-      weights.append(WeightDto.parse_obj(current_row_data))
-    return weights  
+      dto = cls.getDtoFromRow(row)
+      items.append(dto)
+    return items
+
+  @classmethod
+  def getDtoFromRow(cls, row):
+    current_row_data = {
+      "weightId": row["weightId"], 
+      "userId": row["userId"], 
+      "weight": row["weight"], 
+      "notes": row["notes"], 
+      "recordDateTime": row["recordDateTime"]
+    }
+    return WeightDto.parse_obj(current_row_data)

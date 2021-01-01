@@ -14,14 +14,14 @@ from typing import Optional
 from models.User import UserLogon, UserCreateDto, UserOutClean
 from models.Weight import WeightDto
 from models.Pulse import PulseDto
-
+from models.Bp import BpDto
+#
 from DAL.user_dal import user_DAL
 from DAL.weight_dal import weight_DAL
 from DAL.pulse_dal import pulse_DAL
-
+from DAL.bp_dal import bp_DAL
 #
 from utils.pwd_helper import Pwd_Helper
-#from utils.jwt_helper import Jwt_Helper
 
 # configuration
 DEBUG = True
@@ -169,14 +169,14 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
 # Weight
 ##########################################
 @app.get(f"{ROOT_PATH}/weightstats/{{user_id}}", response_model=List[WeightDto], response_model_exclude_unset=False)
-async def get_weights_by_user(user_id: int, current_user: User = Depends(get_current_active_user)):
+async def get_weight_by_user(user_id: int, current_user: User = Depends(get_current_active_user)):
   weight_stats = weight_DAL.get_weights_by_user(user_id)
   if weight_stats == None:
       raise HTTPException(status_code=404, detail="User not found")
   return weight_stats
 
 @app.post(f'{ROOT_PATH}/weightstats/{{user_id}}/{{weight_id}}', status_code=201) #201 = created
-async def create_weight_stat(user_id: int, weight_id: int, weight_dto: WeightDto, current_user: User = Depends(get_current_active_user)):
+async def update_weight(user_id: int, weight_id: int, weight_dto: WeightDto, current_user: User = Depends(get_current_active_user)):
   try:
     weight_DAL.update_weight(weight_dto)
     return None
@@ -184,7 +184,7 @@ async def create_weight_stat(user_id: int, weight_id: int, weight_dto: WeightDto
     raise HTTPException(status_code=400, detail=str(e))
 
 @app.delete(f'{ROOT_PATH}/weightstats/{{user_id}}/{{weight_id}}', status_code=201) #201 = created
-async def delete_weight_stat(user_id: int, weight_id: int, current_user: User = Depends(get_current_active_user)):
+async def delete_weight(user_id: int, weight_id: int, current_user: User = Depends(get_current_active_user)):
   try:
     weight_DAL.delete_weight(weight_id)
     return None
@@ -192,7 +192,7 @@ async def delete_weight_stat(user_id: int, weight_id: int, current_user: User = 
     raise HTTPException(status_code=400, detail=str(e))
 
 @app.post(f'{ROOT_PATH}/weightstats/', status_code=201) #201 = created
-async def create_weight_stat(weight_dto: WeightDto, current_user: User = Depends(get_current_active_user)):
+async def create_weight(weight_dto: WeightDto, current_user: User = Depends(get_current_active_user)):
   try:
     weight_DAL.add_weight(weight_dto)
     return None
@@ -203,14 +203,14 @@ async def create_weight_stat(weight_dto: WeightDto, current_user: User = Depends
 # Pulse
 ##########################################
 @app.get(f"{ROOT_PATH}/pulsestats/{{user_id}}", response_model=List[PulseDto], response_model_exclude_unset=False)
-async def get_pulsestats_by_user(user_id: int, current_user: User = Depends(get_current_active_user)):
+async def get_pulse_by_user(user_id: int, current_user: User = Depends(get_current_active_user)):
   pulse_stats = pulse_DAL.get_pulse_stats_by_user(user_id)
   if pulse_stats == None:
       raise HTTPException(status_code=404, detail="User not found")
   return pulse_stats
 
 @app.post(f'{ROOT_PATH}/pulsestats/{{user_id}}/{{pulse_id}}', status_code=201) #201 = created
-async def create_pulse_stat(user_id: int, pulse_id: int, pulse_dto: PulseDto, current_user: User = Depends(get_current_active_user)):
+async def update_pulse_stat(user_id: int, pulse_id: int, pulse_dto: PulseDto, current_user: User = Depends(get_current_active_user)):
   try:
     pulse_DAL.update_pulse(pulse_dto)
     return None
@@ -226,32 +226,52 @@ async def delete_pulse_stat(user_id: int, pulse_id: int, current_user: User = De
     raise HTTPException(status_code=400, detail=str(e))
 
 @app.post(f'{ROOT_PATH}/pulsestats/', status_code=201) #201 = created
-async def create_pulse_stat(pulse_dto: PulseDto, current_user: User = Depends(get_current_active_user)):
+async def create_pulse(pulse_dto: PulseDto, current_user: User = Depends(get_current_active_user)):
   try:
     return pulse_DAL.add_pulse(pulse_dto)
   except Exception as e:
     raise HTTPException(status_code=400, detail=str(e))
 
-    # if not request.json or requestJsonPropInvalid(request, 'userId') or requestJsonPropInvalid(request, 'email') or requestJsonPropInvalid(request, 'password'): 
-    #     return ResponseHandler(errorMessage = "Something went wrong, please try again.").jsonify()
+##########################################
+# BP
+##########################################
+@app.get(f"{ROOT_PATH}/bpstats/{{user_id}}", response_model=List[BpDto], response_model_exclude_unset=False)
+async def get_bp_by_user(user_id: int, current_user: User = Depends(get_current_active_user)):
 
-    # user = DAL_user.validate_user(userId=request.json['userId'], email=request.json['email'], password=request.json['password'])
-    # if user:
-    #     del user["password"]        
-    #     # Create Token
-    #     # Until Then
-    #     return ResponseHandler(user).jsonify()
-    # else:
-    #     return ResponseHandler(errorMessage = "Incorrect username or password").jsonify()    
-
-# @app.get("/secure", dependencies=[Depends(auth)])
-# async def secure() -> bool:
-#     return True
+  print("")
+  print("")
+  print("")
+  print("get bp by user")
+  print(user_id)
+  print("")
+  print("")
+  print("")
 
 
-# @app.get("/not_secure")
-# async def not_secure() -> bool:
-#     return True
+  bp_stats = bp_DAL.get_bp_by_user(user_id)
+  if bp_stats == None:
+      raise HTTPException(status_code=404, detail="User not found")
+  return bp_stats
 
-##############################################
+@app.post(f'{ROOT_PATH}/bpstats/{{user_id}}/{{bp_id}}', status_code=201) #201 = created
+async def update_bp(user_id: int, bp_id: int, bp_dto: BpDto, current_user: User = Depends(get_current_active_user)):
+  try:
+    bp_DAL.update_bp(bp_dto)
+    return None
+  except Exception as e:
+    raise HTTPException(status_code=400, detail=str(e))
 
+@app.delete(f'{ROOT_PATH}/bpstats/{{user_id}}/{{bp_id}}', status_code=201) #201 = created
+async def delete_bp(user_id: int, bp_id: int, current_user: User = Depends(get_current_active_user)):
+  try:
+    bp_DAL.delete_bp(bp_id)
+    return None
+  except Exception as e:
+    raise HTTPException(status_code=400, detail=str(e))
+
+@app.post(f'{ROOT_PATH}/bpstats/', status_code=201) #201 = created
+async def create_bp(bp_dto: BpDto, current_user: User = Depends(get_current_active_user)):
+  try:
+    return bp_DAL.add_bp(bp_dto)
+  except Exception as e:
+    raise HTTPException(status_code=400, detail=str(e))

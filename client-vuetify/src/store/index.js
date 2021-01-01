@@ -12,7 +12,8 @@ export default new Vuex.Store({
     token: localStorageService.getToken() || '',
     user : localStorageService.getUser() || {},
     weightStats: [],
-    pulseStats: []
+    pulseStats: [],
+    bpStats: [],
   },
   mutations: {
     auth_request(state){
@@ -70,7 +71,26 @@ export default new Vuex.Store({
       if (index !== -1){
         state.pulseStats.splice(index, 1);
       }       
-    }
+    },
+    // Bp Mutations
+    set_bp_stats(state, bpStats){
+      state.bpStats = bpStats;
+    },
+    add_bp_stat(state, bpStat){
+      state.bpStats.push(bpStat)
+    },
+    update_bp_stat(state, bpStat){
+      const index = state.bpStats.findIndex(item => item.bpId === bpStat.bpId);
+      if (index !== -1){
+        state.bpStats.splice(index, 1, bpStat);
+      } 
+    },
+    delete_bp_stat(state, bpStat){
+      const index = state.bpStats.findIndex(item => item.bpId === bpStat.bpId);
+      if (index !== -1){
+        state.bpStats.splice(index, 1);
+      }       
+    }    
   },
   actions: {
     login({commit}, creds){
@@ -188,10 +208,6 @@ export default new Vuex.Store({
       return new Promise((resolve, reject) => {
         statTrackerService.addPulseStatForUser(pulseStat)
           .then(result => {
-
-            console.log("Result")
-            console.log(result)
-            
             const pulseStat = result.data;
             commit('add_pulse_stat', pulseStat);
             resolve(result);
@@ -226,7 +242,60 @@ export default new Vuex.Store({
               reject(err);
           })
       });
-    }        
+    },
+    // BP Actions
+    getBpStat({commit}, userId){
+      return new Promise((resolve, reject) => {
+        statTrackerService.getBpStatsByUser(userId)
+          .then(result => {
+            const bpStats = result.data;
+            commit('set_bp_stats', bpStats);
+            resolve(result);
+          })
+          .catch(err => {
+            reject(err);
+          })
+      })
+    },
+    addBpStat({commit}, bpStat){
+      return new Promise((resolve, reject) => {
+        statTrackerService.addBpStatForUser(bpStat)
+          .then(result => {
+            const bpStat = result.data;
+            commit('add_bp_stat', bpStat);
+            resolve(result);
+          })
+          .catch(err => {
+            reject(err);
+          })
+      });
+    },
+    updateBpStat({commit}, bpStat){
+      //Object.assign(this.desserts[this.editedIndex], this.dto)
+      return new Promise((resolve, reject) => {
+        statTrackerService.updateBpStatForUser(bpStat)
+          .then(result => {
+              commit('update_bp_stat', bpStat);
+              resolve(result);
+          })
+          .catch(err => {
+              reject(err);
+          })
+      });
+    },
+    deleteBpStat({commit}, bpStat){
+      //Object.assign(this.desserts[this.editedIndex], this.dto)
+      return new Promise((resolve, reject) => {
+        statTrackerService.deleteBpStatForUser(bpStat)
+          .then(result => {
+              commit('delete_bp_stat', bpStat);
+              resolve(result);
+          })
+          .catch(err => {
+              reject(err);
+          })
+      });
+    }    
   },
   modules: {
   },
@@ -238,6 +307,9 @@ export default new Vuex.Store({
     },
     userPulseStats: (state) => {
       return state.pulseStats ? state.pulseStats : []
+    },
+    userBpStats: (state) => {
+      return state.bpStats ? state.bpStats : []
     }    
   }  
 })
