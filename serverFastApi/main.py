@@ -237,17 +237,6 @@ async def create_pulse(pulse_dto: PulseDto, current_user: User = Depends(get_cur
 ##########################################
 @app.get(f"{ROOT_PATH}/bpstats/{{user_id}}", response_model=List[BpDto], response_model_exclude_unset=False)
 async def get_bp_by_user(user_id: int, current_user: User = Depends(get_current_active_user)):
-
-  print("")
-  print("")
-  print("")
-  print("get bp by user")
-  print(user_id)
-  print("")
-  print("")
-  print("")
-
-
   bp_stats = bp_DAL.get_bp_by_user(user_id)
   if bp_stats == None:
       raise HTTPException(status_code=404, detail="User not found")
