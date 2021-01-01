@@ -60,4 +60,22 @@ export default new class {
         return axiosInstance.post(`/weightstats/${weightStat.userId}/${weightStat.weightId}`, weightStat, this.getAuthorizationHeader());
     }        
     ////#endregion
+
+    //#region User Pulse Stats
+    getPulseStatsByUser(userId){
+        return axiosInstance(`/pulsestats/${userId}`, this.getAuthorizationHeader());
+    }
+
+    addPulseStatForUser(pulseStat){
+        return axiosInstance.post(`/pulsestats`, pulseStat, this.getAuthorizationHeader());
+    }    
+
+    deletePulseStatForUser(pulseStat){
+        return axiosInstance.delete(`/pulsestats/${pulseStat.userId}/${pulseStat.pulseId}`, this.getAuthorizationHeader());
+    } 
+
+    updatePulseStatForUser(pulseStat){
+        return axiosInstance.post(`/pulsestats/${pulseStat.userId}/${pulseStat.pulseId}`, pulseStat, this.getAuthorizationHeader());
+    }        
+    ////#endregion    
  }

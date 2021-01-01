@@ -11,7 +11,8 @@ export default new Vuex.Store({
     status: '',
     token: localStorageService.getToken() || '',
     user : localStorageService.getUser() || {},
-    weightStats: []
+    weightStats: [],
+    pulseStats: []
   },
   mutations: {
     auth_request(state){
@@ -32,7 +33,7 @@ export default new Vuex.Store({
     set_user(state, user){
       state.user = user;
     },
-    /////
+    // Weight Mutations
     set_weight_stats(state, weightStats){
       state.weightStats = weightStats;
     },
@@ -49,6 +50,25 @@ export default new Vuex.Store({
       const index = state.weightStats.findIndex(item => item.weightId === weightStat.weightId);
       if (index !== -1){
         state.weightStats.splice(index, 1);
+      }       
+    },
+    // Pulse Mutations
+    set_pulse_stats(state, pulseStats){
+      state.pulseStats = pulseStats;
+    },
+    add_pulse_stat(state, pulseStat){
+      state.pulseStats.push(pulseStat)
+    },
+    update_pulse_stat(state, pulseStat){
+      const index = state.pulseStats.findIndex(item => item.pulseId === pulseStat.pulseId);
+      if (index !== -1){
+        state.pulseStats.splice(index, 1, pulseStat);
+      } 
+    },
+    delete_pulse_stat(state, pulseStat){
+      const index = state.pulseStats.findIndex(item => item.pulseId === pulseStat.pulseId);
+      if (index !== -1){
+        state.pulseStats.splice(index, 1);
       }       
     }
   },
@@ -93,7 +113,7 @@ export default new Vuex.Store({
         resolve();
       })
     },
-    // Weights
+    // Weight Actions
     getWeightStat({commit}, userId){
       return new Promise((resolve, reject) => {
         statTrackerService.getWeightStatsByUser(userId)
@@ -107,7 +127,6 @@ export default new Vuex.Store({
           })
       })
     },
-    // Weight Stats
     addWeightStat({commit}, weightStat){
       return new Promise((resolve, reject) => {
         statTrackerService.addWeightStatForUser(weightStat)
@@ -145,7 +164,64 @@ export default new Vuex.Store({
               reject(err);
           })
       });
-    }    
+    },
+    // Pulse Actions
+    getPulseStat({commit}, userId){
+      return new Promise((resolve, reject) => {
+        statTrackerService.getPulseStatsByUser(userId)
+          .then(result => {
+            const pulseStats = result.data;
+            commit('set_pulse_stats', pulseStats);
+            resolve(result);
+          })
+          .catch(err => {
+            reject(err);
+          })
+      })
+    },
+    addPulseStat({commit}, pulseStat){
+      return new Promise((resolve, reject) => {
+        statTrackerService.addPulseStatForUser(pulseStat)
+          .then(result => {
+
+            console.log("Result")
+            console.log(result)
+            
+            const pulseStat = result.data;
+            commit('add_pulse_stat', pulseStat);
+            resolve(result);
+          })
+          .catch(err => {
+            reject(err);
+          })
+      });
+    },
+    updatePulseStat({commit}, pulseStat){
+      //Object.assign(this.desserts[this.editedIndex], this.dto)
+      return new Promise((resolve, reject) => {
+        statTrackerService.updatePulseStatForUser(pulseStat)
+          .then(result => {
+              commit('update_pulse_stat', pulseStat);
+              resolve(result);
+          })
+          .catch(err => {
+              reject(err);
+          })
+      });
+    },
+    deletePulseStat({commit}, pulseStat){
+      //Object.assign(this.desserts[this.editedIndex], this.dto)
+      return new Promise((resolve, reject) => {
+        statTrackerService.deletePulseStatForUser(pulseStat)
+          .then(result => {
+              commit('delete_pulse_stat', pulseStat);
+              resolve(result);
+          })
+          .catch(err => {
+              reject(err);
+          })
+      });
+    }        
   },
   modules: {
   },
@@ -154,6 +230,9 @@ export default new Vuex.Store({
     authStatus: state => state.status,
     userWeightStats: (state) => {
       return state.weightStats ? state.weightStats : []
-    }
+    },
+    userPulseStats: (state) => {
+      return state.pulseStats ? state.pulseStats : []
+    }    
   }  
 })

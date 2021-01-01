@@ -10,18 +10,18 @@
         <WeightComponent />
       </v-tab-item>
 
+      <v-tab href="#pulse">
+        Pulse
+      </v-tab>
+      <v-tab-item value="pulse">
+        <PulseComponent />
+      </v-tab-item>
+
       <v-tab href="#bp">
         Blood Pressure
       </v-tab>
       <v-tab-item value="bp">
         Blood Pressure goes here
-      </v-tab-item>
-
-      <v-tab href="#pulse">
-        Pulse
-      </v-tab>
-      <v-tab-item value="pulse">
-        Pulse data goes here
       </v-tab-item>
 
     </v-tabs>
@@ -32,6 +32,7 @@
 <script>
 import statTrackerService from '@/services/statTrackerService'
 import WeightComponent from '@/components/WeightComponent.vue'
+import PulseComponent from '@/components/PulseComponent.vue'
 
 export default {
   name: 'UserStats',
@@ -60,7 +61,8 @@ export default {
     }
   },
   components: {
-    WeightComponent
+    WeightComponent,
+    PulseComponent
   },  
   created() {
     //this.getUserWeightStats();

@@ -13,9 +13,11 @@ from typing import Optional
 #from application.app.folder.file import func_name
 from models.User import UserLogon, UserCreateDto, UserOutClean
 from models.Weight import WeightDto
+from models.Pulse import PulseDto
 
 from DAL.user_dal import user_DAL
 from DAL.weight_dal import weight_DAL
+from DAL.pulse_dal import pulse_DAL
 
 #
 from utils.pwd_helper import Pwd_Helper
@@ -196,10 +198,39 @@ async def create_weight_stat(weight_dto: WeightDto, current_user: User = Depends
     return None
   except Exception as e:
     raise HTTPException(status_code=400, detail=str(e))
-    # validate_password = Pwd_Helper.verify_password(userCreate.password, hash_password)
-    # print(validate_password)
 
+##########################################
+# Pulse
+##########################################
+@app.get(f"{ROOT_PATH}/pulsestats/{{user_id}}", response_model=List[PulseDto], response_model_exclude_unset=False)
+async def get_pulsestats_by_user(user_id: int, current_user: User = Depends(get_current_active_user)):
+  pulse_stats = pulse_DAL.get_pulse_stats_by_user(user_id)
+  if pulse_stats == None:
+      raise HTTPException(status_code=404, detail="User not found")
+  return pulse_stats
 
+@app.post(f'{ROOT_PATH}/pulsestats/{{user_id}}/{{pulse_id}}', status_code=201) #201 = created
+async def create_pulse_stat(user_id: int, pulse_id: int, pulse_dto: PulseDto, current_user: User = Depends(get_current_active_user)):
+  try:
+    pulse_DAL.update_pulse(pulse_dto)
+    return None
+  except Exception as e:
+    raise HTTPException(status_code=400, detail=str(e))
+
+@app.delete(f'{ROOT_PATH}/pulsestats/{{user_id}}/{{pulse_id}}', status_code=201) #201 = created
+async def delete_pulse_stat(user_id: int, pulse_id: int, current_user: User = Depends(get_current_active_user)):
+  try:
+    pulse_DAL.delete_pulse(pulse_id)
+    return None
+  except Exception as e:
+    raise HTTPException(status_code=400, detail=str(e))
+
+@app.post(f'{ROOT_PATH}/pulsestats/', status_code=201) #201 = created
+async def create_pulse_stat(pulse_dto: PulseDto, current_user: User = Depends(get_current_active_user)):
+  try:
+    return pulse_DAL.add_pulse(pulse_dto)
+  except Exception as e:
+    raise HTTPException(status_code=400, detail=str(e))
 
     # if not request.json or requestJsonPropInvalid(request, 'userId') or requestJsonPropInvalid(request, 'email') or requestJsonPropInvalid(request, 'password'): 
     #     return ResponseHandler(errorMessage = "Something went wrong, please try again.").jsonify()
