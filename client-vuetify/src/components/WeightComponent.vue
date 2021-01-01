@@ -115,8 +115,8 @@ export default {
         notes: '',
       },           
       headers: [
-        { text: 'Date', value: 'recordDateTime', sortable: false, width: "13rem" },
-        { text: 'Weight', value: 'weight', sortable: false, width: "6rem" },
+        { text: 'Date', value: 'recordDateTime', sortable: false, width: "12rem" },
+        { text: 'Weight', value: 'weight', sortable: false, width: "5rem" },
         { text: 'Notes', value: 'notes', sortable: false },
         { text: 'Actions', value: 'actions', sortable: false, align: 'end' }
       ],

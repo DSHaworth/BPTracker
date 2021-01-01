@@ -16,7 +16,6 @@ class pulse_DAL:
             (?, ?, ?, ?, ?)""", (pulse.userId, pulse.pulse, pulse.activity, pulse.notes, pulse.recordDateTime,))
       con.commit()
 
-    # with closing(con.cursor()) as c:
       c.execute("""
         SELECT 
           pulseId, userId, pulse, activity, notes, recordDateTime
@@ -37,14 +36,6 @@ class pulse_DAL:
         "notes": row["notes"], 
         "recordDateTime": row["recordDateTime"]
       }
-
-      print("")
-      print("")
-      print("Newest row")
-      print(current_row_data)
-      print("")
-      print("")
-
       return PulseDto.parse_obj(current_row_data)
     else:
         return None

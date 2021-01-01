@@ -15,7 +15,29 @@ class weight_DAL:
         VALUES
             (?, ?, ?, ?)""", (weight.userId, weight.weight, weight.notes, weight.recordDateTime,))
       con.commit()
-    return weight   
+
+      c.execute("""
+        SELECT 
+          weightId, userId, weight, notes, recordDateTime
+        FROM
+          weight
+        WHERE
+          userId=?
+        ORDER BY 
+          weightId DESC LIMIT 1""", (weight.userId,))
+      row = c.fetchone()
+
+    if row:   
+      current_row_data = {
+        "weightId": row["weightId"], 
+        "userId": row["userId"], 
+        "weight": row["weight"], 
+        "notes": row["notes"], 
+        "recordDateTime": row["recordDateTime"]
+      }
+      return WeightDto.parse_obj(current_row_data)
+    else:
+      return None
 
   @classmethod
   def update_weight(cls, weight):

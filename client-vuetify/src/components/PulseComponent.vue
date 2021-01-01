@@ -114,9 +114,9 @@ export default {
         notes: '',
       },           
       headers: [
-        { text: 'Date', value: 'recordDateTime', sortable: false, width: "13rem" },
-        { text: 'Pulse', value: 'pulse', sortable: false, width: "6rem" },
-        { text: 'Activity', value: 'activity', sortable: false, width: "5rem" },
+        { text: 'Date', value: 'recordDateTime', sortable: false, width: "12rem" },
+        { text: 'Pulse', value: 'pulse', sortable: false, width: "4rem" },
+        { text: 'Activity', value: 'activity', sortable: false, width: "9rem" },
         { text: 'Notes', value: 'notes', sortable: false },
         { text: 'Actions', value: 'actions', sortable: false, align: 'end' }
       ],

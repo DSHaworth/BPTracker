@@ -123,6 +123,11 @@ export default new Vuex.Store({
             resolve(result);
           })
           .catch(err => {
+            if(err.response.status === 401){
+              // commit('logout');
+              // localStorageService.removeToken();
+              // localStorageService.removeUser();                  
+            }
             reject(err);
           })
       })

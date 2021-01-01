@@ -135,14 +135,12 @@ export default {
         this.$store.dispatch('updatePulseStat', dto)
           .then(() => {            
             snackbarService.showSuccess({
-              text: "Record updated"
+              text: "Record updated",
+              timeout: 1000
             });            
           })
-          .catch(err => {
-            this.$refs.form.reset();
-
+          .catch(err => {           
             console.log(err);
-
             snackbarService.showError({
               text: err.response.data.detail
             })
@@ -153,12 +151,13 @@ export default {
           })
       } 
       else {
-        
         this.$store.dispatch('addPulseStat', dto)
           .then(() => {
             snackbarService.showSuccess({
-              text: "New pulse added"
-            })
+              text: "New pulse added",
+              timeout: 1500
+            });
+            this.$refs.form.reset();
           })
           .catch(err => {
             this.$refs.form.reset();
