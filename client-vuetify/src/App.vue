@@ -3,7 +3,7 @@
 
     <v-app-bar app color="deep-purple accent-4" dense dark>
 
-      <v-toolbar-title>State Tracker</v-toolbar-title>
+      <v-toolbar-title>StatTracker</v-toolbar-title>
 
       <v-toolbar-items class="hidden-sm-and-down">
         <v-btn text to="/">Home</v-btn>

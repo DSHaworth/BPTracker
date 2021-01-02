@@ -4,7 +4,8 @@
 import axios from 'axios';
 import store from '@/store'
 
-let baseUrl = "http://localhost:8000/stattracker/api/v1";
+//let baseUrl = "http://localhost:8000/stattracker/api/v1";
+let baseUrl = "http://127.0.0.1:8000/stattracker/api/v1"
 let axiosInstance = null;
 
 export default new class {
