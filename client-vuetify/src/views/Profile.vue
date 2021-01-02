@@ -4,21 +4,10 @@
         <h1>{{currentUser.firstname}} {{currentUser.lastname}}</h1>
 
             <div style="display: flex; flex-flow: row wrap; justify-content: flex-start; align-content: flex-start;">
-                <v-card v-if="getWeightChartValues.length > 1" class="mt-4 mx-auto" max-width="400">
-                    <v-sheet class="v-sheet--offset mx-auto" color="cyan" elevation="12" max-width="calc(100% - 32px)">
-                        <v-sparkline
-                            v-if="getWeightChartValues.length > 1"
-                            :value="getWeightChartValues"
-                            :gradient="sparklineConfig.gradient"
-                            :smooth="sparklineConfig.radius || false"
-                            :padding="sparklineConfig.padding"
-                            :line-width="sparklineConfig.width"
-                            :stroke-linecap="sparklineConfig.lineCap"
-                            :gradient-direction="sparklineConfig.gradientDirection"
-                            :fill="sparklineConfig.fill"
-                            :type="sparklineConfig.type"
-                            :auto-line-width="sparklineConfig.autoLineWidth"        
-                            auto-draw />
+                
+                <v-card v-if="getWeightChartValues.length > 1" class="mt-4 mx-auto" width="33%" min-width="150px;">
+                    <v-sheet class="v-sheet--offset mx-auto" elevation="5" max-width="calc(100% - 32px)">
+                        <GChart type="LineChart" :data="getWeightChartValues" :options="chartOptions" :resizeDebounce="50"  />
                     </v-sheet>
                     <v-card-text class="pt-0">
                     <div class="title font-weight-light mb-2">
@@ -26,7 +15,7 @@
                     </div>
                     <div class="subheading font-weight-light grey--text">
                         From {{ formatDate(getWeightChartValuesSorted[0].recordDateTime) }}
-                        To {{ formatDate(getWeightChartValuesSorted[getWeightChartValues.length - 1].recordDateTime) }}
+                        To {{ formatDate(getWeightChartValuesSorted[getWeightChartValuesSorted.length - 1].recordDateTime) }}
                     </div>
                     <v-divider class="my-2"></v-divider>
                     <v-icon class="mr-2" small>
@@ -38,20 +27,9 @@
                     </v-card-text>
                 </v-card>
 
-                <v-card v-if="getPulseChartValues.length > 2" class="mt-4 mx-auto" max-width="400">
-                    <v-sheet class="v-sheet--offset mx-auto" color="cyan" elevation="12" max-width="calc(100% - 32px)">
-                        <v-sparkline                            
-                            :value="getPulseChartValues"
-                            :gradient="sparklineConfig.gradient"
-                            :smooth="sparklineConfig.radius || false"
-                            :padding="sparklineConfig.padding"
-                            :line-width="sparklineConfig.width"
-                            :stroke-linecap="sparklineConfig.lineCap"
-                            :gradient-direction="sparklineConfig.gradientDirection"
-                            :fill="sparklineConfig.fill"
-                            :type="sparklineConfig.type"
-                            :auto-line-width="sparklineConfig.autoLineWidth"        
-                            auto-draw />
+                <v-card v-if="getPulseChartValues.length > 2" class="mt-4 mx-auto" width="33%">
+                    <v-sheet class="v-sheet--offset mx-auto" elevation="5" max-width="calc(100% - 32px)">                        
+                        <GChart type="LineChart" :data="getPulseChartValues" :options="chartOptions" :resizeDebounce="50"  />                        
                     </v-sheet>
                     <v-card-text class="pt-0">
                     <div class="title font-weight-light mb-2">
@@ -59,7 +37,7 @@
                     </div>
                     <div class="subheading font-weight-light grey--text">
                         From {{ formatDate(getPulseChartValuesSorted[0].recordDateTime) }}
-                        To {{ formatDate(getPulseChartValuesSorted[getWeightChartValues.length - 1].recordDateTime) }}
+                        To {{ formatDate(getPulseChartValuesSorted[getPulseChartValuesSorted.length - 1].recordDateTime) }}
                     </div>
                     <v-divider class="my-2"></v-divider>
                     <v-icon class="mr-2" small>
@@ -71,35 +49,36 @@
                     </v-card-text>
                 </v-card>
 
-                <v-card v-if="getBpChartValues.length > 2" class="mt-4 mx-auto" max-width="400">
-                    <v-sheet class="v-sheet--offset mx-auto" color="cyan" elevation="12" max-width="calc(100% - 32px)">
-                        <v-sparkline                            
-                            :value="getBpChartValues"
-                            :gradient="sparklineConfig.gradient"
-                            :smooth="sparklineConfig.radius || false"
-                            :padding="sparklineConfig.padding"
-                            :line-width="sparklineConfig.width"
-                            :stroke-linecap="sparklineConfig.lineCap"
-                            :gradient-direction="sparklineConfig.gradientDirection"
-                            :fill="sparklineConfig.fill"
-                            :type="sparklineConfig.type"
-                            :auto-line-width="sparklineConfig.autoLineWidth"        
-                            auto-draw />
+                <v-card v-if="getBpChartValuesSorted.length >= 2" class="mt-4 mx-auto" width="33%">
+                    <v-sheet class="v-sheet--offset mx-auto" elevation="5" max-width="calc(100% - 32px)">
+                        <template v-if="getBpChartValuesSorted.length >= 2">
+                            <GChart type="LineChart" :data="getBpChartValues" :options="chartOptions" :resizeDebounce="50"  />
+                        </template>
+                        <template v-else>
+                            <div style="height: 150px; display: flex; justify-content: center; align-items: center">
+                                Not enough data
+                            </div>
+                        </template>
                     </v-sheet>
                     <v-card-text class="pt-0">
                     <div class="title font-weight-light mb-2">
-                        User Pulse
+                        Blood Pressure
                     </div>
                     <div class="subheading font-weight-light grey--text">
                         From {{ formatDate(getBpChartValuesSorted[0].recordDateTime) }}
-                        To {{ formatDate(getBpChartValuesSorted[getWeightChartValues.length - 1].recordDateTime) }}
+                        To {{ formatDate(getBpChartValuesSorted[getBpChartValuesSorted.length - 1].recordDateTime) }}
                     </div>
                     <v-divider class="my-2"></v-divider>
                     <v-icon class="mr-2" small>
                         mdi-clock
                     </v-icon>
                     <span class="caption grey--text font-weight-light">
-                        {{getLastRecordedDateDays(getBpChartValuesSorted[getBpChartValuesSorted.length - 1])}}
+                        <template v-if="getBpChartValuesSorted.length >= 2">
+                            {{getLastRecordedDateDays(getBpChartValuesSorted[getBpChartValuesSorted.length - 1])}}
+                        </template>
+                        <template v-else>
+                            Not enough data
+                        </template>
                     </span>
                     </v-card-text>
                 </v-card>
@@ -113,31 +92,47 @@
 import { mapState, mapGetters  } from 'vuex'
 import snackbarService from '@/services/snackbarService'
 import EventBus from '@/eventBus'
+import { GChart } from "vue-google-charts";
 
 export default {
     name: 'ProfileComponent',
     data () {
         return {
             loading: false,
-            sparklineConfig: {
-                width: 2,
-                radius: 10,
-                padding: 8,
-                lineCap: 'round',
-                gradient: [
-                ['#222'],
-                ['#42b3f4'],
-                ['red', 'orange', 'yellow'],
-                ['purple', 'violet'],
-                ['#00c6ff', '#F0F', '#FF0'],
-                ['#f72047', '#ffd200', '#1feaea'],
-                ],                
-                value: [0, 2, 5, 9, 5, 10, 3, 5, 0, 0, 1, 8, 2, 9, 0],
-                gradientDirection: 'top',
-                fill: false,
-                type: 'trend',
-                autoLineWidth: false,        
-            }            
+            bpData: [
+                ["dt", "sys", "dia"],
+                ["2014", 55, 185],
+                ["2015", 66, 123],
+                ["2016", 95, 140],
+                ["2017", 73, 120]
+            ],
+            chartOptions: {
+                curveType: 'function',
+                legend: {position: 'none'},
+                hAxis: { 
+                    textPosition: 'none',                  
+                },
+                vAxis: { 
+                    textPosition: 'none',
+                    gridlines: {
+                        color: 'transparent'
+                    },
+                    // viewWindow: {
+                    //     min: 20,
+                    //     max: 300
+                    // },
+                    //ticks: [0, 25, 50, 75, 100] // display labels every 25                    
+                },
+                chartArea: {
+                    //left: 40,
+                    // leave room for y-axis labels
+                    width: '100%'
+                },
+                width: '100%',
+                height: '150'
+                //title: "Pulse",
+                //subtitle: "Sales, Expenses, and Profit: 2014-2017"
+            }
         }
     },
     computed: {
@@ -150,7 +145,9 @@ export default {
             return sortByDate.reverse();
         },        
         getWeightChartValues: function(){
-            return this.getWeightChartValuesSorted.map(a => parseFloat(a.weight));  // Return only pulse field
+            let values = this.getWeightChartValuesSorted.map(a => [this.formatDateTime(a.recordDateTime), parseFloat(a.weight)]);
+            values.unshift(["DateTime", "Weight"]);
+            return values;
         },
         getPulseChartValuesSorted: function(){
             let sortByDate = this.userPulseStats
@@ -159,7 +156,9 @@ export default {
             return sortByDate.reverse();
         },        
         getPulseChartValues: function(){
-            return this.getPulseChartValuesSorted.map(a => parseInt(a.pulse));  // Return only pulse field
+            let values = this.getPulseChartValuesSorted.map(a => [this.formatDateTime(a.recordDateTime), parseInt(a.pulse)]);
+            values.unshift(["DateTime", "Pulse"]);
+            return values;
         },
         getBpChartValuesSorted: function(){
             let sortByDate = this.userBpStats
@@ -168,7 +167,9 @@ export default {
             return sortByDate.reverse();
         },           
         getBpChartValues: function(){
-            return this.getBpChartValuesSorted.map(a => parseInt(a.sys));  // Return only pulse field
+            let values = this.getBpChartValuesSorted.map( a => [this.formatDateTime(a.recordDateTime), a.sys, a.dia]);
+            values.unshift(["DateTime", "Sys", "Dia"]);
+            return values;
         }        
     },
     methods: {
@@ -180,7 +181,7 @@ export default {
                 this.$store.dispatch('getPulseStat', this.currentUser.userId),
                 this.$store.dispatch('getBpStat', this.currentUser.userId)
             ]).then((values) => {
-                console.log(values[0]);
+                
             })
             .catch(error => {
                 if(error.response.status === 401){
@@ -197,16 +198,16 @@ export default {
             })                
         },
         formatDate(dateToFormat){
-            //return new Date(dateToFormat).toDateString(); 
             return new Date(dateToFormat).toLocaleDateString(); 
         },
+        formatDateTime(dateToFormat){
+            let thisDate = new Date(dateToFormat);
+            return thisDate.toLocaleString();  
+        },        
         getLastRecordedDateDays(lastRecordedDate){
             let lastDate = new Date(lastRecordedDate.recordDateTime); 
             let today = new Date(); 
             
-            console.log("lastDate: " + lastDate);
-            console.log("today: " + today)
-
             // To calculate the time difference of two dates 
             var Difference_In_Time = today.getTime() - lastDate.getTime(); 
             
@@ -223,6 +224,9 @@ export default {
             return `${parseInt(diff)} days ago`;
         }
     },
+    components: {
+        GChart
+    },    
     created() {
         this.getUserData();
     }  
