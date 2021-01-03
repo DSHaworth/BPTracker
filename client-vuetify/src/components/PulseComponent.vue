@@ -113,6 +113,7 @@ export default {
         { text: 'Actions', value: 'actions', sortable: false, align: 'end' }
       ],
       chartData: [],
+      api: null,
       chartOptions: {
         legend: 'none',
         tooltip: {isHtml: true},
@@ -148,7 +149,16 @@ export default {
     }
   },
   watch: {
-    
+    api() {
+      this.setChartValues();
+    },
+    getPulseChartValues(){
+      // Resized smaller here
+      // Not sure why
+      if(this.api){
+        this.setChartValues();
+      }
+    }
   },  
   computed: {
     ...mapState({currentUser: "user"}),
@@ -157,10 +167,10 @@ export default {
       return (this.editedItem.pulseId === 0) ? "Add Item" : "Edit Item";
     },    
     getPulseChartValuesSorted: function(){
-        let sortByDate = this.userPulseStats
-                            .slice() // Make copy of original array (avoids changing original array when sorting)
-                            .sort((a, b) => Date.parse(b.recordDateTime) - Date.parse(a.recordDateTime))
-        return sortByDate.reverse();
+      let sortByDate = this.userPulseStats
+                          .slice() // Make copy of original array (avoids changing original array when sorting)
+                          .sort((a, b) => Date.parse(b.recordDateTime) - Date.parse(a.recordDateTime))
+      return sortByDate.reverse();
     },        
     getPulseChartValues: function(){
       let sortedDates = this.getPulseChartValuesSorted;
@@ -173,8 +183,8 @@ export default {
         let pulseData = mapValues.map( i => i.pulse).sort();
         let newRow = [];
         let tooltip = pulseData[0] === pulseData[pulseData.length-1] 
-                      ? `${pulseData[0]}`
-                      : `Ranged from ${pulseData[0]} to ${pulseData[pulseData.length-1]}`
+                      ? `<div style="padding: .5rem; width: 8rem;">Single reading${pulseData[0]}</div>`
+                      : `<div style="padding: .5rem; width: 5rem;">Highest: ${pulseData[pulseData.length-1]} <br/> Lowest: ${pulseData[0]}<div>`
 
         newRow.push(mapKey, pulseData[0], pulseData[0], pulseData[pulseData.length-1], pulseData[pulseData.length-1], tooltip);
         values.push(newRow);
@@ -204,9 +214,10 @@ export default {
 
       this.showDialog = true;
     },
-    onChartReady (chart, api) {
+    setChartValues(){
+      // https://codesandbox.io/s/my172nvy79?module=/src/App.vue&file=/src/App.vue
       // https://github.com/devstark-com/vue-google-charts/issues/37
-      const dataTable = new api.visualization.DataTable();
+      const dataTable = new this.api.visualization.DataTable();
       dataTable.addColumn('string', 'data');
       dataTable.addColumn('number', 'num1');
       dataTable.addColumn('number', 'num2');
@@ -215,10 +226,14 @@ export default {
       dataTable.addColumn({
         type: 'string',
         role: 'tooltip',
+        p: { 'html': true }
       });
 
       dataTable.addRows(this.getPulseChartValues);
       this.chartData = dataTable;
+    },
+    onChartReady (chart, api) {
+      this.api = api;
     },    
     onCloseCreate: function(){
       this.showDialog = false;

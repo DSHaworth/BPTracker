@@ -96,10 +96,6 @@ export default {
     },
 
     getValidChartData () {
-
-      console.log("this.firstRowAsData");
-      console.log(this.firstRowAsData)
-
       if (this.data instanceof chartsLib.visualization.DataTable) return this.data
       if (this.data instanceof chartsLib.visualization.DataView) return this.data
       if (Array.isArray(this.data)) return chartsLib.visualization.arrayToDataTable(this.data, this.firstRowAsData)
