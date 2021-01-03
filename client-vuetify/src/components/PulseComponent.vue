@@ -152,12 +152,8 @@ export default {
     api() {
       this.setChartValues();
     },
-    getPulseChartValues(){
-      // Resized smaller here
-      // Not sure why
-      if(this.api){
-        this.setChartValues();
-      }
+    getPulseChartValuesSorted(){
+      this.setChartValues();
     }
   },  
   computed: {
@@ -172,25 +168,6 @@ export default {
                           .sort((a, b) => Date.parse(b.recordDateTime) - Date.parse(a.recordDateTime))
       return sortByDate.reverse();
     },        
-    getPulseChartValues: function(){
-      let sortedDates = this.getPulseChartValuesSorted;
-      //let reformatedDates = values.map( a => ({...a, recordDateTime: commonService.formatDate(a.recordDateTime)}) )
-      let reformatedDates = sortedDates.map( a => ({recordDateTime: commonService.formatDate(a.recordDateTime), pulse: a.pulse}) )
-      let grouped = commonService.groupBy(reformatedDates, rdt => rdt.recordDateTime)
-
-      let values = []
-      grouped.forEach( (mapValues, mapKey) => {
-        let pulseData = mapValues.map( i => i.pulse).sort();
-        let newRow = [];
-        let tooltip = pulseData[0] === pulseData[pulseData.length-1] 
-                      ? `<div style="padding: .5rem; width: 8rem;">Single reading${pulseData[0]}</div>`
-                      : `<div style="padding: .5rem; width: 5rem;">Highest: ${pulseData[pulseData.length-1]} <br/> Lowest: ${pulseData[0]}<div>`
-
-        newRow.push(mapKey, pulseData[0], pulseData[0], pulseData[pulseData.length-1], pulseData[pulseData.length-1], tooltip);
-        values.push(newRow);
-      })
-      return values;
-    },
   },
   methods: {
     // Table Actions
@@ -215,6 +192,28 @@ export default {
       this.showDialog = true;
     },
     setChartValues(){
+
+      if(!this.api){
+        return;
+      }
+
+      let sortedDates = this.getPulseChartValuesSorted;
+      //let reformatedDates = values.map( a => ({...a, recordDateTime: commonService.formatDate(a.recordDateTime)}) )
+      let reformatedDates = sortedDates.map( a => ({recordDateTime: commonService.formatDate(a.recordDateTime), pulse: a.pulse}) )
+      let grouped = commonService.groupBy(reformatedDates, rdt => rdt.recordDateTime)
+
+      let chartValues = []
+      grouped.forEach( (mapValues, mapKey) => {
+        let pulseData = mapValues.map( i => i.pulse).sort();
+        let newRow = [];
+        let tooltip = pulseData[0] === pulseData[pulseData.length-1] 
+                      ? `<div style="padding: .5rem; width: 8rem;">Single reading${pulseData[0]}</div>`
+                      : `<div style="padding: .5rem; width: 8rem;">Highest: ${pulseData[pulseData.length-1]} <br/> Lowest: ${pulseData[0]}<div>`
+
+        newRow.push(mapKey, pulseData[0], pulseData[0], pulseData[pulseData.length-1], pulseData[pulseData.length-1], tooltip);
+        chartValues.push(newRow);
+      })
+      
       // https://codesandbox.io/s/my172nvy79?module=/src/App.vue&file=/src/App.vue
       // https://github.com/devstark-com/vue-google-charts/issues/37
       const dataTable = new this.api.visualization.DataTable();
@@ -229,7 +228,7 @@ export default {
         p: { 'html': true }
       });
 
-      dataTable.addRows(this.getPulseChartValues);
+      dataTable.addRows(chartValues);
       this.chartData = dataTable;
     },
     onChartReady (chart, api) {
