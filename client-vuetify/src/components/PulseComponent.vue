@@ -64,7 +64,7 @@
     </v-tab>
     <v-tab-item value="chart">
 
-      <GChartCustom type="CandlestickChart" :data="getPulseChartValues" :options="chartOptions" :resizeDebounce="50" :firstRowAsData="true"  />
+      <GChartCustom type="CandlestickChart" :data="chartData" :options="chartOptions" :resizeDebounce="50" :firstRowAsData="true" @ready="onChartReady" />
 
     </v-tab-item>
   </v-tabs>
@@ -112,8 +112,10 @@ export default {
         { text: 'Notes', value: 'notes', sortable: false },
         { text: 'Actions', value: 'actions', sortable: false, align: 'end' }
       ],
+      chartData: [],
       chartOptions: {
         legend: 'none',
+        tooltip: {isHtml: true},
         bar: { groupWidth: '5%' }, // Remove space between bars.
         // candlestick: {
         //   fallingColor: { strokeWidth: 0, fill: '#a52714' }, // red
@@ -145,6 +147,9 @@ export default {
       }
     }
   },
+  watch: {
+    
+  },  
   computed: {
     ...mapState({currentUser: "user"}),
     ...mapGetters(['userPulseStats', 'isLoggedIn']),
@@ -167,7 +172,11 @@ export default {
       grouped.forEach( (mapValues, mapKey) => {
         let pulseData = mapValues.map( i => i.pulse).sort();
         let newRow = [];
-        newRow.push(mapKey, pulseData[0], pulseData[0], pulseData[pulseData.length-1], pulseData[pulseData.length-1]);
+        let tooltip = pulseData[0] === pulseData[pulseData.length-1] 
+                      ? `${pulseData[0]}`
+                      : `Ranged from ${pulseData[0]} to ${pulseData[pulseData.length-1]}`
+
+        newRow.push(mapKey, pulseData[0], pulseData[0], pulseData[pulseData.length-1], pulseData[pulseData.length-1], tooltip);
         values.push(newRow);
       })
       return values;
@@ -195,6 +204,22 @@ export default {
 
       this.showDialog = true;
     },
+    onChartReady (chart, api) {
+      // https://github.com/devstark-com/vue-google-charts/issues/37
+      const dataTable = new api.visualization.DataTable();
+      dataTable.addColumn('string', 'data');
+      dataTable.addColumn('number', 'num1');
+      dataTable.addColumn('number', 'num2');
+      dataTable.addColumn('number', 'num3');
+      dataTable.addColumn('number', 'num4');
+      dataTable.addColumn({
+        type: 'string',
+        role: 'tooltip',
+      });
+
+      dataTable.addRows(this.getPulseChartValues);
+      this.chartData = dataTable;
+    },    
     onCloseCreate: function(){
       this.showDialog = false;
     },
