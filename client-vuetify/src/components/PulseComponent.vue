@@ -64,18 +64,7 @@
     </v-tab>
     <v-tab-item value="chart">
 
-      <v-sparkline
-        :value="getChartValues"
-        :gradient="sparklineConfig.gradient"
-        :smooth="sparklineConfig.radius || false"
-        :padding="sparklineConfig.padding"
-        :line-width="sparklineConfig.width"
-        :stroke-linecap="sparklineConfig.lineCap"
-        :gradient-direction="sparklineConfig.gradientDirection"
-        :fill="sparklineConfig.fill"
-        :type="sparklineConfig.type"
-        :auto-line-width="sparklineConfig.autoLineWidth"        
-        auto-draw />
+      <GChartCustom type="CandlestickChart" :data="getPulseChartValues" :options="chartOptions" :resizeDebounce="50" :firstRowAsData="true"  />
 
     </v-tab-item>
   </v-tabs>
@@ -84,8 +73,11 @@
 
 <script>
 import { mapState, mapGetters  } from 'vuex'
+import GChartCustom from "@/components/GChart/GChartCustom.vue";
+
 import PulseAddEditDialog from '@/components/PulseAddEditDialog.vue'
 import snackbarService from '@/services/snackbarService'
+import commonService from '@/services/commonService'
 import EventBus from '@/eventBus'
 
 export default {
@@ -120,24 +112,36 @@ export default {
         { text: 'Notes', value: 'notes', sortable: false },
         { text: 'Actions', value: 'actions', sortable: false, align: 'end' }
       ],
-      sparklineConfig: {
-        width: 2,
-        radius: 10,
-        padding: 8,
-        lineCap: 'round',
-        gradient: [
-          ['#222'],
-          ['#42b3f4'],
-          ['red', 'orange', 'yellow'],
-          ['purple', 'violet'],
-          ['#00c6ff', '#F0F', '#FF0'],
-          ['#f72047', '#ffd200', '#1feaea'],
-        ],
-        value: [0, 2, 5, 9, 5, 10, 3, 5, 0, 0, 1, 8, 2, 9, 0],
-        gradientDirection: 'top',
-        fill: false,
-        type: 'trend',
-        autoLineWidth: false,        
+      chartOptions: {
+        legend: 'none',
+        bar: { groupWidth: '5%' }, // Remove space between bars.
+        // candlestick: {
+        //   fallingColor: { strokeWidth: 0, fill: '#a52714' }, // red
+        //   risingColor: { strokeWidth: 0, fill: '#0f9d58' }   // green
+        // }        
+        hAxis: { 
+            //textPosition: 'none',                  
+        },
+        // vAxis: { 
+        //     // textPosition: 'none',
+        //     // gridlines: {
+        //     //     color: 'transparent'
+        //     // },
+        //     // viewWindow: {
+        //     //     min: 20,
+        //     //     max: 300
+        //     // },
+        //     //ticks: [0, 25, 50, 75, 100] // display labels every 25                    
+        // },
+        chartArea: {
+            left: 40,
+            // leave room for y-axis labels
+            width: '100%'
+        },
+        // width: '100%',
+        // //height: '150'
+        // //title: "Pulse",
+        // //subtitle: "Sales, Expenses, and Profit: 2014-2017"
       }
     }
   },
@@ -147,13 +151,27 @@ export default {
     formTitle () {
       return (this.editedItem.pulseId === 0) ? "Add Item" : "Edit Item";
     },    
-    getChartValues: function(){
-      let sortByDate = this.userPulseStats
-                        .slice() // Make copy of original array (avoids changing original array when sorting)
-                        .sort((a, b) => Date.parse(b.recordDateTime) - Date.parse(a.recordDateTime))
-                        .map(a => parseFloat(a.pulse));  // Return only pulse field
-      return sortByDate.reverse();
-    }
+    getPulseChartValuesSorted: function(){
+        let sortByDate = this.userPulseStats
+                            .slice() // Make copy of original array (avoids changing original array when sorting)
+                            .sort((a, b) => Date.parse(b.recordDateTime) - Date.parse(a.recordDateTime))
+        return sortByDate.reverse();
+    },        
+    getPulseChartValues: function(){
+      let sortedDates = this.getPulseChartValuesSorted;
+      //let reformatedDates = values.map( a => ({...a, recordDateTime: commonService.formatDate(a.recordDateTime)}) )
+      let reformatedDates = sortedDates.map( a => ({recordDateTime: commonService.formatDate(a.recordDateTime), pulse: a.pulse}) )
+      let grouped = commonService.groupBy(reformatedDates, rdt => rdt.recordDateTime)
+
+      let values = []
+      grouped.forEach( (mapValues, mapKey) => {
+        let pulseData = mapValues.map( i => i.pulse).sort();
+        let newRow = [];
+        newRow.push(mapKey, pulseData[0], pulseData[0], pulseData[pulseData.length-1], pulseData[pulseData.length-1]);
+        values.push(newRow);
+      })
+      return values;
+    },
   },
   methods: {
     // Table Actions
@@ -254,6 +272,7 @@ export default {
     }
   },
   components: {
+    GChartCustom,
     PulseAddEditDialog
   },
   created(){

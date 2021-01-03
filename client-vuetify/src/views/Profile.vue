@@ -90,22 +90,16 @@
 
 <script>
 import { mapState, mapGetters  } from 'vuex'
+import { GChart } from "vue-google-charts";
+
 import snackbarService from '@/services/snackbarService'
 import EventBus from '@/eventBus'
-import { GChart } from "vue-google-charts";
 
 export default {
     name: 'ProfileComponent',
     data () {
         return {
             loading: false,
-            bpData: [
-                ["dt", "sys", "dia"],
-                ["2014", 55, 185],
-                ["2015", 66, 123],
-                ["2016", 95, 140],
-                ["2017", 73, 120]
-            ],
             chartOptions: {
                 curveType: 'function',
                 legend: {position: 'none'},

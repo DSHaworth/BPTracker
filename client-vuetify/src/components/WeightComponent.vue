@@ -66,20 +66,7 @@
       Chart
     </v-tab>
     <v-tab-item value="chart">
-
-      <v-sparkline
-        :value="getChartValues"
-        :gradient="sparklineConfig.gradient"
-        :smooth="sparklineConfig.radius || false"
-        :padding="sparklineConfig.padding"
-        :line-width="sparklineConfig.width"
-        :stroke-linecap="sparklineConfig.lineCap"
-        :gradient-direction="sparklineConfig.gradientDirection"
-        :fill="sparklineConfig.fill"
-        :type="sparklineConfig.type"
-        :auto-line-width="sparklineConfig.autoLineWidth"        
-        auto-draw />
-
+      <GChart type="LineChart" :data="getWeightChartValues" :options="chartOptions" :resizeDebounce="50"  />
     </v-tab-item>
   </v-tabs>
 
@@ -87,8 +74,11 @@
 
 <script>
 import { mapState, mapGetters  } from 'vuex'
+import { GChart } from "vue-google-charts";
+
 import WeightAddEditDialog from '@/components/WeightAddEditDialog.vue'
 import snackbarService from '@/services/snackbarService'
+import commonService from '@/services/commonService'
 import EventBus from '@/eventBus'
 
 export default {
@@ -120,24 +110,32 @@ export default {
         { text: 'Notes', value: 'notes', sortable: false },
         { text: 'Actions', value: 'actions', sortable: false, align: 'end' }
       ],
-      sparklineConfig: {
-        width: 2,
-        radius: 10,
-        padding: 8,
-        lineCap: 'round',
-        gradient: [
-          ['#222'],
-          ['#42b3f4'],
-          ['red', 'orange', 'yellow'],
-          ['purple', 'violet'],
-          ['#00c6ff', '#F0F', '#FF0'],
-          ['#f72047', '#ffd200', '#1feaea'],
-        ],
-        value: [0, 2, 5, 9, 5, 10, 3, 5, 0, 0, 1, 8, 2, 9, 0],
-        gradientDirection: 'top',
-        fill: false,
-        type: 'trend',
-        autoLineWidth: false,        
+      chartOptions: {
+        curveType: 'function',
+        legend: {position: 'none'},
+        hAxis: { 
+            //textPosition: 'none',                  
+        },
+        vAxis: { 
+            // textPosition: 'none',
+            // gridlines: {
+            //     color: 'transparent'
+            // },
+            // viewWindow: {
+            //     min: 20,
+            //     max: 300
+            // },
+            //ticks: [0, 25, 50, 75, 100] // display labels every 25                    
+        },
+        chartArea: {
+            left: 40,
+            // leave room for y-axis labels
+            width: '100%'
+        },
+        width: '100%',
+        //height: '150'
+        //title: "Pulse",
+        //subtitle: "Sales, Expenses, and Profit: 2014-2017"
       }
     }
   },
@@ -147,13 +145,17 @@ export default {
     formTitle () {
       return (this.editedItem.weightId === 0) ? "Add Item" : "Edit Item";
     },    
-    getChartValues: function(){
-      let sortByDate = this.userWeightStats
-                        .slice() // Make copy of original array (avoids changing original array when sorting)
-                        .sort((a, b) => Date.parse(b.recordDateTime) - Date.parse(a.recordDateTime))
-                        .map(a => parseFloat(a.weight));  // Return only weight field
-      return sortByDate.reverse();
-    }
+    getWeightChartValuesSorted: function(){
+        let sortByDate = this.userWeightStats
+                            .slice() // Make copy of original array (avoids changing original array when sorting)
+                            .sort((a, b) => Date.parse(b.recordDateTime) - Date.parse(a.recordDateTime))                                
+        return sortByDate.reverse();
+    },        
+    getWeightChartValues: function(){
+        let values = this.getWeightChartValuesSorted.map(a => [commonService.formatDateTime(a.recordDateTime), parseFloat(a.weight)]);
+        values.unshift(["DateTime", "Weight"]);
+        return values;
+    },    
   },
   methods: {
     // Table Actions
@@ -254,6 +256,7 @@ export default {
     }
   },
   components: {
+    GChart,
     WeightAddEditDialog
   },
   created(){
