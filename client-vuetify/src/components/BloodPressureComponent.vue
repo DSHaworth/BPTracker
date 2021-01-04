@@ -53,7 +53,7 @@
     </v-tab>
     <v-tab-item value="chart">
 
-      <GChart type="LineChart" :data="getBpChartValues" :options="chartOptions" :resizeDebounce="50"  />
+      <BloodPressureChart />
 
     </v-tab-item>
   </v-tabs>
@@ -62,12 +62,11 @@
 
 <script>
 import { mapState, mapGetters  } from 'vuex'
-import { GChart } from "vue-google-charts";
 
 import BloodPressureAddEditDialog from '@/components/BloodPressureAddEditDialog.vue'
+import BloodPressureChart from '@/components/BloodPressureChart.vue'
 import DeleteConfirm from '@/components/DeleteConfirm.vue'
 import snackbarService from '@/services/snackbarService'
-import commonService from '@/services/commonService'
 import EventBus from '@/eventBus'
 
 export default {
@@ -111,33 +110,6 @@ export default {
         { text: 'Notes', value: 'notes', sortable: false },
         { text: 'Actions', value: 'actions', sortable: false, align: 'end' }
       ],
-      chartOptions: {
-        curveType: 'function',
-        legend: {position: 'none'},
-        hAxis: { 
-            //textPosition: 'none',                  
-        },
-        vAxis: { 
-            // textPosition: 'none',
-            // gridlines: {
-            //     color: 'transparent'
-            // },
-            // viewWindow: {
-            //     min: 20,
-            //     max: 300
-            // },
-            //ticks: [0, 25, 50, 75, 100] // display labels every 25                    
-        },
-        chartArea: {
-            left: 40,
-            // leave room for y-axis labels
-            width: '100%'
-        },
-        width: '100%',
-        //height: '150'
-        //title: "Pulse",
-        //subtitle: "Sales, Expenses, and Profit: 2014-2017"
-      }
     }
   },
   computed: {
@@ -145,18 +117,7 @@ export default {
     ...mapGetters(['userBpStats', 'isLoggedIn']),
     formTitle () {
       return (this.editedItem.bpId === 0) ? "Add Item" : "Edit Item";
-    },    
-    getBpChartValuesSorted: function(){
-        let sortByDate = this.userBpStats
-                            .slice() // Make copy of original array (avoids changing original array when sorting)
-                            .sort((a, b) => Date.parse(b.recordDateTime) - Date.parse(a.recordDateTime));
-        return sortByDate.reverse();
-    },           
-    getBpChartValues: function(){
-        let values = this.getBpChartValuesSorted.map( a => [commonService.formatDateTime(a.recordDateTime), a.sys, a.dia]);
-        values.unshift(["DateTime", "Sys", "Dia"]);
-        return values;
-    }    
+    }
   },
   methods: {
     // Table Actions
@@ -260,7 +221,7 @@ export default {
     }
   },
   components: {
-    GChart,
+    BloodPressureChart,
     DeleteConfirm,
     BloodPressureAddEditDialog
   },
