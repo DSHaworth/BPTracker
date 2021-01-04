@@ -40,18 +40,7 @@
         </v-data-table>
 
         <blood-pressure-add-edit-dialog :showDialog="showDialog" :formTitle="formTitle" :item="editedItem" v-on:close-create="onCloseCreate"/>
-
-        <v-dialog v-model="showDeleteDialog" max-width="500px">
-          <v-card>
-            <v-card-title class="headline">Are you sure you want to delete this item?</v-card-title>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
-              <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
-              <v-spacer></v-spacer>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>        
+        <delete-confirm :showDeleteDialog="showDeleteDialog" @cancel-delete="deleteClose" @confirm-delete="deleteConfirm"/>  
 
       </v-sheet>  
     </v-tab-item>
@@ -76,6 +65,7 @@ import { mapState, mapGetters  } from 'vuex'
 import { GChart } from "vue-google-charts";
 
 import BloodPressureAddEditDialog from '@/components/BloodPressureAddEditDialog.vue'
+import DeleteConfirm from '@/components/DeleteConfirm.vue'
 import snackbarService from '@/services/snackbarService'
 import commonService from '@/services/commonService'
 import EventBus from '@/eventBus'
@@ -222,10 +212,10 @@ export default {
       this.editedItem.userId = this.currentUser.userId;
       this.showDeleteDialog = true
     },
-    closeDelete () {
+    deleteClose () {
       this.showDeleteDialog = false
     },
-    deleteItemConfirm () {
+    deleteConfirm () {
 
       this.loading = true;
       this.$store.dispatch('deleteBpStat', this.editedItem)
@@ -271,6 +261,7 @@ export default {
   },
   components: {
     GChart,
+    DeleteConfirm,
     BloodPressureAddEditDialog
   },
   created(){
