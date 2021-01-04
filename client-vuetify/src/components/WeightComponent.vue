@@ -43,18 +43,7 @@
         </v-data-table>
 
         <weight-add-edit-dialog :showDialog="showDialog" :formTitle="formTitle" :item="editedItem" v-on:close-create="onCloseCreate"/>
-
-        <v-dialog v-model="showDeleteDialog" max-width="500px">
-          <v-card>
-            <v-card-title class="headline">Are you sure you want to delete this item?</v-card-title>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
-              <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
-              <v-spacer></v-spacer>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>        
+        <delete-confirm :showDeleteDialog="showDeleteDialog" @cancel-delete="deleteClose" @confirm-delete="deleteConfirm"/>
 
       </v-sheet>  
     </v-tab-item>
@@ -66,7 +55,7 @@
       Chart
     </v-tab>
     <v-tab-item value="chart">
-      <GChart type="LineChart" :data="getWeightChartValues" :options="chartOptions" :resizeDebounce="50"  />
+      <WeightChart />
     </v-tab-item>
   </v-tabs>
 
@@ -74,9 +63,11 @@
 
 <script>
 import { mapState, mapGetters  } from 'vuex'
-import { GChart } from "vue-google-charts";
+//import { GChart } from "vue-google-charts";
 
 import WeightAddEditDialog from '@/components/WeightAddEditDialog.vue'
+import WeightChart from '@/components/WeightChart.vue'
+import DeleteConfirm from '@/components/DeleteConfirm.vue'
 import snackbarService from '@/services/snackbarService'
 import commonService from '@/services/commonService'
 import EventBus from '@/eventBus'
@@ -110,55 +101,16 @@ export default {
         { text: 'Notes', value: 'notes', sortable: false },
         { text: 'Actions', value: 'actions', sortable: false, align: 'end' }
       ],
-      chartOptions: {
-        curveType: 'function',
-        legend: {position: 'none'},
-        hAxis: { 
-            //textPosition: 'none',                  
-        },
-        vAxis: { 
-            // textPosition: 'none',
-            // gridlines: {
-            //     color: 'transparent'
-            // },
-            // viewWindow: {
-            //     min: 20,
-            //     max: 300
-            // },
-            //ticks: [0, 25, 50, 75, 100] // display labels every 25                    
-        },
-        chartArea: {
-            left: 40,
-            // leave room for y-axis labels
-            width: '100%'
-        },
-        width: '100%',
-        //height: '150'
-        //title: "Pulse",
-        //subtitle: "Sales, Expenses, and Profit: 2014-2017"
-      }
-    }
+     }
   },
   computed: {
     ...mapState({currentUser: "user"}),
     ...mapGetters(['userWeightStats', 'isLoggedIn']),
     formTitle () {
       return (this.editedItem.weightId === 0) ? "Add Item" : "Edit Item";
-    },    
-    getWeightChartValuesSorted: function(){
-        let sortByDate = this.userWeightStats
-                            .slice() // Make copy of original array (avoids changing original array when sorting)
-                            .sort((a, b) => Date.parse(b.recordDateTime) - Date.parse(a.recordDateTime))                                
-        return sortByDate.reverse();
-    },        
-    getWeightChartValues: function(){
-        let values = this.getWeightChartValuesSorted.map(a => [commonService.formatDateTime(a.recordDateTime), parseFloat(a.weight)]);
-        values.unshift(["DateTime", "Weight"]);
-        return values;
-    },    
-  },
+    }
+  },   
   methods: {
-    // Table Actions
     onShowCreate: function(){
       this.editedItem = this.defaultItem;
 
@@ -208,10 +160,10 @@ export default {
       this.editedItem.userId = this.currentUser.userId;
       this.showDeleteDialog = true
     },
-    closeDelete () {
+    deleteClose () {
       this.showDeleteDialog = false
     },
-    deleteItemConfirm () {
+    deleteConfirm () {
 
       this.loading = true;
       this.$store.dispatch('deleteWeightStat', this.editedItem)
@@ -227,7 +179,7 @@ export default {
         })
         .then(() => {
           this.loading = false;
-          this.closeDelete();
+          this.deleteClose();
         })
     },
     //https://codepen.io/mmia/pen/jOPyXad?editors=1010
@@ -256,7 +208,8 @@ export default {
     }
   },
   components: {
-    GChart,
+    DeleteConfirm,
+    WeightChart,
     WeightAddEditDialog
   },
   created(){
