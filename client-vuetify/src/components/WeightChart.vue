@@ -42,13 +42,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['userWeightStats']),
-    getWeightChartValuesSorted: function(){
-        let sortByDate = this.userWeightStats
-                            .slice() // Make copy of original array (avoids changing original array when sorting)
-                            .sort((a, b) => Date.parse(b.recordDateTime) - Date.parse(a.recordDateTime))                                
-        return sortByDate.reverse();
-    },        
+    ...mapGetters(['userWeightStats', 'getWeightChartValuesSorted']),
     getWeightChartValues: function(){
         let values = this.getWeightChartValuesSorted.map(a => [commonService.formatDateTime(a.recordDateTime), parseFloat(a.weight)]);
         values.unshift(["DateTime", "Weight"]);

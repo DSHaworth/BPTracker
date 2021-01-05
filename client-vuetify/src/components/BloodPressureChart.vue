@@ -41,13 +41,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['userBpStats']),
-    getBpChartValuesSorted: function(){
-        let sortByDate = this.userBpStats
-                            .slice() // Make copy of original array (avoids changing original array when sorting)
-                            .sort((a, b) => Date.parse(b.recordDateTime) - Date.parse(a.recordDateTime));
-        return sortByDate.reverse();
-    },           
+    ...mapGetters(['userBpStats', 'getBpChartValuesSorted']),
     getBpChartValues: function(){
         let values = this.getBpChartValuesSorted.map( a => [commonService.formatDateTime(a.recordDateTime), a.sys, a.dia]);
         values.unshift(["DateTime", "Sys", "Dia"]);

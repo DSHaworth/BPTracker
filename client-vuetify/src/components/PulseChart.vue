@@ -64,17 +64,9 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["userPulseStats"]),
+    ...mapGetters(["userPulseStats", 'getPulseChartValuesSorted']),
     formTitle() {
       return this.editedItem.pulseId === 0 ? "Add Item" : "Edit Item";
-    },
-    getPulseChartValuesSorted: function () {
-      let sortByDate = this.userPulseStats
-        .slice() // Make copy of original array (avoids changing original array when sorting)
-        .sort(
-          (a, b) => Date.parse(b.recordDateTime) - Date.parse(a.recordDateTime)
-        );
-      return sortByDate.reverse();
     },
   },
   methods: {

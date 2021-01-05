@@ -305,11 +305,35 @@ export default new Vuex.Store({
     userWeightStats: (state) => {
       return state.weightStats ? state.weightStats : []
     },
+
+    getWeightChartValuesSorted: (state) => {
+      let sortByDate = state.weightStats
+                          .slice() // Make copy of original array (avoids changing original array when sorting)
+                          .sort((a, b) => Date.parse(b.recordDateTime) - Date.parse(a.recordDateTime))                                
+      return sortByDate.reverse();
+    },      
+
     userPulseStats: (state) => {
       return state.pulseStats ? state.pulseStats : []
     },
+
+    getPulseChartValuesSorted: (state) => {
+      let sortByDate = state.pulseStats
+        .slice() // Make copy of original array (avoids changing original array when sorting)
+        .sort(
+          (a, b) => Date.parse(b.recordDateTime) - Date.parse(a.recordDateTime)
+        );
+      return sortByDate.reverse();
+    },    
+
     userBpStats: (state) => {
       return state.bpStats ? state.bpStats : []
-    }    
+    },
+    getBpChartValuesSorted: (state) => {
+      let sortByDate = state.bpStats
+                          .slice() // Make copy of original array (avoids changing original array when sorting)
+                          .sort((a, b) => Date.parse(b.recordDateTime) - Date.parse(a.recordDateTime));
+      return sortByDate.reverse();
+    },      
   }  
 })
