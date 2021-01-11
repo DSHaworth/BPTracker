@@ -15,8 +15,10 @@ export default {
       chartOptions: {
         curveType: 'function',
         legend: {position: 'none'},
-        hAxis: { 
-            //textPosition: 'none',                  
+        hAxis: {
+            //title: "Date",
+            //gridlines: { count: 3, color: '#CCC' },
+            format: 'dd-MMM-yyyy'
         },
         vAxis: { 
             // textPosition: 'none',
@@ -44,7 +46,8 @@ export default {
   computed: {
     ...mapGetters(['userWeightStats', 'getWeightChartValuesSorted']),
     getWeightChartValues: function(){
-        let values = this.getWeightChartValuesSorted.map(a => [commonService.formatDateTime(a.recordDateTime), parseFloat(a.weight)]);
+        //let values = this.getWeightChartValuesSorted.map(a => [commonService.formatDateTime(a.recordDateTime), parseFloat(a.weight)]);
+        let values = this.getWeightChartValuesSorted.map(a => [new Date(a.recordDateTime), parseFloat(a.weight)]);
         values.unshift(["DateTime", "Weight"]);
         return values;
     },    

@@ -138,7 +138,13 @@ export default new Vuex.Store({
       return new Promise((resolve, reject) => {
         statTrackerService.getWeightStatsByUser(userId)
           .then(result => {
+            
             const weightStats = result.data;
+            // const weightStats = result.data.map( a => ({ 
+            //   ...a,
+            //   recordDateTime: new Date(a.recordDateTime)
+            // }));
+            
             commit('set_weight_stats', weightStats);
             resolve(result);
           })
